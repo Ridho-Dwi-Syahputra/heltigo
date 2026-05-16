@@ -1,4 +1,5 @@
 {
+  // TypeScript compiler configuration
   "compilerOptions": {
     "target": "ES2022",
     "module": "CommonJS",
@@ -11,6 +12,11 @@
     "resolveJsonModule": true,
     "moduleResolution": "node"
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "tests"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "tests"
+  ]
 }

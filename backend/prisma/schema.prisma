@@ -19,8 +19,627 @@ model User {
   updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp()
   deletedAt       DateTime? @map("deleted_at") @db.Timestamp()
 
+  healthProfile   HealthProfile?
+  settings        Setting?
+  refreshTokens   RefreshToken[]
+  fcmTokens       FcmToken[]
+  workoutPlans    WorkoutPlan[]
+  mealPlans       MealPlan[]
+  workoutSessions WorkoutSession[]
+  mealLogs        MealLog[]
+  dailyLogs       DailyLog[]
+  streak          Streak?
+  userBadges      UserBadge[]
+  notifications   Notification[]
+  syncOpsLogs     SyncOpsLog[]
+
   @@index([deletedAt], map: "idx_users_deleted_at")
   @@map("users")
 }
 
-// Tambahkan model lainnya sesuai schema.sql jika dibutuhkan...
+model HealthProfile {
+  id                   BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  userId               BigInt       @unique @map("user_id") @db.UnsignedBigInt
+  age                  Int          @db.UnsignedTinyInt
+  gender               Gender
+  dateOfBirth          DateTime?    @map("date_of_birth") @db.Date
+  heightCm             Decimal      @map("height_cm") @db.Decimal(5, 2)
+  weightKg             Decimal      @map("weight_kg") @db.Decimal(5, 2)
+  startWeightKg        Decimal      @map("start_weight_kg") @db.Decimal(5, 2)
+  targetWeightKg       Decimal?     @map("target_weight_kg") @db.Decimal(5, 2)
+  fitnessLevel         FitnessLevel @map("fitness_level")
+  goal                 Goal
+  healthConditions     Json         @map("health_conditions")
+  allergies            Json
+  dietaryRestrictions  Json         @map("dietary_restrictions")
+  preferredEquipment   Json         @map("preferred_equipment")
+  availableDaysPerWeek Int          @default(3) @map("available_days_per_week") @db.UnsignedTinyInt
+  sessionDurationMin   Int          @default(30) @map("session_duration_min") @db.UnsignedTinyInt
+  workoutMode          WorkoutMode  @default(HOME) @map("workout_mode")
+  budgetPerDayIdr      Decimal      @default(50000.00) @map("budget_per_day_idr") @db.Decimal(12, 2)
+  createdAt            DateTime     @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt            DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamp()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("health_profiles")
+}
+
+enum Gender {
+  M
+  F
+  OTHER
+}
+
+enum FitnessLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum Goal {
+  WEIGHT_LOSS
+  MUSCLE_GAIN
+  MAINTENANCE
+  PERFORMANCE
+}
+
+enum WorkoutMode {
+  HOME
+  GYM
+  HYBRID
+}
+
+model Setting {
+  id                   BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  userId               BigInt    @unique @map("user_id") @db.UnsignedBigInt
+  theme                Theme     @default(DARK)
+  language             Language  @default(id)
+  timezone             String    @default("Asia/Jakarta") @db.VarChar(50)
+  notificationsEnabled Boolean   @default(true) @map("notifications_enabled")
+  dailyReminderTime    DateTime? @map("daily_reminder_time") @db.Time()
+  workoutReminderTime  DateTime? @map("workout_reminder_time") @db.Time()
+  mealReminderTime     DateTime? @map("meal_reminder_time") @db.Time()
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("settings")
+}
+
+enum Theme {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+enum Language {
+  id
+  en
+}
+
+model RefreshToken {
+  id        BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  userId    BigInt    @map("user_id") @db.UnsignedBigInt
+  tokenHash String    @unique @map("token_hash") @db.VarChar(64)
+  expiresAt DateTime  @map("expires_at") @db.Timestamp()
+  revokedAt DateTime? @map("revoked_at") @db.Timestamp()
+  userAgent String?   @map("user_agent") @db.VarChar(255)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt], map: "idx_refresh_tokens_user_active")
+  @@map("refresh_tokens")
+}
+
+model FcmToken {
+  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  userId    BigInt   @map("user_id") @db.UnsignedBigInt
+  token     String   @unique @db.VarChar(255)
+  platform  Platform
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "idx_fcm_tokens_user")
+  @@map("fcm_tokens")
+}
+
+enum Platform {
+  ANDROID
+  IOS
+  WEB
+}
+
+model ExerciseMaster {
+  id             BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  slug           String       @unique @db.VarChar(80)
+  name           String       @db.VarChar(100)
+  description    String?      @db.Text
+  instructions   Json?
+  muscleGroups   Json?        @map("muscle_groups")
+  equipment      Json?
+  difficulty     FitnessLevel
+  tips           Json?
+  videoUrl       String?      @map("video_url") @db.VarChar(500)
+  imageUrl       String?      @map("image_url") @db.VarChar(500)
+  defaultSets    Int?         @map("default_sets") @db.UnsignedTinyInt
+  defaultReps    Int?         @map("default_reps") @db.UnsignedSmallInt
+  defaultRestSec Int?         @map("default_rest_sec") @db.UnsignedSmallInt
+  isActive       Boolean      @default(true) @map("is_active")
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamp()
+
+  exercises Exercise[]
+
+  @@index([difficulty, isActive], map: "idx_exercise_master_difficulty")
+  @@map("exercise_master")
+}
+
+model FoodMaster {
+  id                 BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  slug               String       @unique @db.VarChar(120)
+  name               String       @db.VarChar(150)
+  category           FoodCategory
+  cuisine            Cuisine      @default(INDONESIAN)
+  basePortion        String       @map("base_portion") @db.VarChar(50)
+  basePortionGram    Int          @default(100) @map("base_portion_gram") @db.UnsignedSmallInt
+  caloriesPerPortion Int          @map("calories_per_portion") @db.UnsignedSmallInt
+  proteinG           Decimal      @map("protein_g") @db.Decimal(6, 2)
+  carbsG             Decimal      @map("carbs_g") @db.Decimal(6, 2)
+  fatG               Decimal      @map("fat_g") @db.Decimal(6, 2)
+  fiberG             Decimal      @default(0) @map("fiber_g") @db.Decimal(6, 2)
+  estimatedPriceIdr  Decimal      @map("estimated_price_idr") @db.Decimal(12, 2)
+  isHalal            Boolean      @default(true) @map("is_halal")
+  isVegetarian       Boolean      @default(false) @map("is_vegetarian")
+  isVegan            Boolean      @default(false) @map("is_vegan")
+  isGlutenFree       Boolean      @default(false) @map("is_gluten_free")
+  imageUrl           String?      @map("image_url") @db.VarChar(500)
+  isActive           Boolean      @default(true) @map("is_active")
+  createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamp()
+
+  foodItems FoodItem[]
+
+  @@index([category, isActive], map: "idx_food_master_category")
+  @@map("food_master")
+}
+
+enum FoodCategory {
+  STAPLE
+  PROTEIN
+  VEGETABLE
+  FRUIT
+  BEVERAGE
+  DESSERT
+  SNACK
+}
+
+enum Cuisine {
+  INDONESIAN
+  ASIAN
+  WESTERN
+  OTHER
+}
+
+model WorkoutPlan {
+  id          BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  userId      BigInt      @map("user_id") @db.UnsignedBigInt
+  name        String      @db.VarChar(100)
+  startDate   DateTime    @map("start_date") @db.Date
+  endDate     DateTime    @map("end_date") @db.Date
+  status      PlanStatus  @default(ACTIVE)
+  isActive    Boolean     @default(true) @map("is_active")
+  generatedBy GeneratedBy @default(ML) @map("generated_by")
+  mlMetadata  Json?       @map("ml_metadata")
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt   DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamp()
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workoutDays WorkoutDay[]
+  mealPlans   MealPlan[]
+
+  @@index([userId, isActive], map: "idx_workout_plans_user_active")
+  @@index([userId, startDate, endDate], map: "idx_workout_plans_dates")
+  @@map("workout_plans")
+}
+
+enum PlanStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+  SKIPPED
+}
+
+enum GeneratedBy {
+  ML
+  RULE
+  MANUAL
+}
+
+model WorkoutDay {
+  id          BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  planId      BigInt      @map("plan_id") @db.UnsignedBigInt
+  dayNumber   Int         @map("day_number") @db.UnsignedTinyInt
+  date        DateTime    @db.Date
+  workoutType WorkoutType @map("workout_type")
+  intensity   Intensity?
+  name        String?     @db.VarChar(100)
+  durationMin Int?        @map("duration_min") @db.UnsignedSmallInt
+  totalSets   Int?        @map("total_sets") @db.UnsignedSmallInt
+  isCompleted Boolean     @default(false) @map("is_completed")
+  completedAt DateTime?   @map("completed_at") @db.Timestamp()
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamp()
+
+  workoutPlan     WorkoutPlan      @relation(fields: [planId], references: [id], onDelete: Cascade)
+  exercises       Exercise[]
+  workoutSessions WorkoutSession[]
+
+  @@unique([planId, dayNumber], map: "uniq_workout_days_plan_day")
+  @@index([date], map: "idx_workout_days_date")
+  @@map("workout_days")
+}
+
+enum WorkoutType {
+  STRENGTH
+  CARDIO
+  HIIT
+  FLEXIBILITY
+  REST
+}
+
+enum Intensity {
+  LOW
+  MID
+  HIGH
+}
+
+model Exercise {
+  id               BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  workoutDayId     BigInt           @map("workout_day_id") @db.UnsignedBigInt
+  masterExerciseId BigInt?          @map("master_exercise_id") @db.UnsignedBigInt
+  name             String           @db.VarChar(100)
+  category         ExerciseCategory
+  sets             Int              @db.UnsignedTinyInt
+  reps             Int?             @db.UnsignedSmallInt
+  durationSec      Int?             @map("duration_sec") @db.UnsignedSmallInt
+  restSec          Int              @default(60) @map("rest_sec") @db.UnsignedSmallInt
+  tempo            String?          @db.VarChar(20)
+  notes            String?          @db.Text
+  orderIndex       Int              @map("order_index") @db.UnsignedSmallInt
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamp()
+
+  workoutDay     WorkoutDay      @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
+  exerciseMaster ExerciseMaster? @relation(fields: [masterExerciseId], references: [id], onDelete: SetNull)
+  exerciseLogs   ExerciseLog[]
+
+  @@index([workoutDayId, orderIndex], map: "idx_exercises_workout_day")
+  @@map("exercises")
+}
+
+enum ExerciseCategory {
+  WARMUP
+  MAIN
+  COOLDOWN
+}
+
+model MealPlan {
+  id                   BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  userId               BigInt     @map("user_id") @db.UnsignedBigInt
+  workoutPlanId        BigInt?    @map("workout_plan_id") @db.UnsignedBigInt
+  startDate            DateTime   @map("start_date") @db.Date
+  endDate              DateTime   @map("end_date") @db.Date
+  status               PlanStatus @default(ACTIVE)
+  isActive             Boolean    @default(true) @map("is_active")
+  targetCaloriesPerDay Int        @map("target_calories_per_day") @db.UnsignedSmallInt
+  targetProteinG       Int        @map("target_protein_g") @db.UnsignedSmallInt
+  targetCarbsG         Int        @map("target_carbs_g") @db.UnsignedSmallInt
+  targetFatG           Int        @map("target_fat_g") @db.UnsignedSmallInt
+  budgetPerDayIdr      Decimal    @map("budget_per_day_idr") @db.Decimal(12, 2)
+  createdAt            DateTime   @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt            DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamp()
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workoutPlan WorkoutPlan? @relation(fields: [workoutPlanId], references: [id], onDelete: SetNull)
+  mealDays    MealDay[]
+
+  @@index([userId, isActive], map: "idx_meal_plans_user_active")
+  @@index([userId, startDate, endDate], map: "idx_meal_plans_dates")
+  @@map("meal_plans")
+}
+
+model MealDay {
+  id            BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  planId        BigInt   @map("plan_id") @db.UnsignedBigInt
+  dayNumber     Int      @map("day_number") @db.UnsignedTinyInt
+  date          DateTime @db.Date
+  totalCalories Int?     @map("total_calories") @db.UnsignedSmallInt
+  totalProteinG Decimal? @map("total_protein_g") @db.Decimal(6, 2)
+  totalCarbsG   Decimal? @map("total_carbs_g") @db.Decimal(6, 2)
+  totalFatG     Decimal? @map("total_fat_g") @db.Decimal(6, 2)
+  totalCostIdr  Decimal? @map("total_cost_idr") @db.Decimal(12, 2)
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamp()
+
+  mealPlan  MealPlan   @relation(fields: [planId], references: [id], onDelete: Cascade)
+  mealTimes MealTime[]
+
+  @@unique([planId, dayNumber], map: "uniq_meal_days_plan_day")
+  @@index([date], map: "idx_meal_days_date")
+  @@map("meal_days")
+}
+
+model MealTime {
+  id            BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  mealDayId     BigInt    @map("meal_day_id") @db.UnsignedBigInt
+  mealType      MealType  @map("meal_type")
+  scheduledTime DateTime? @map("scheduled_time") @db.Time()
+  isLogged      Boolean   @default(false) @map("is_logged")
+  loggedAt      DateTime? @map("logged_at") @db.Timestamp()
+  orderIndex    Int       @map("order_index") @db.UnsignedTinyInt
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp()
+
+  mealDay   MealDay    @relation(fields: [mealDayId], references: [id], onDelete: Cascade)
+  foodItems FoodItem[]
+  mealLogs  MealLog[]
+
+  @@index([mealDayId, mealType], map: "idx_meal_times_day_type")
+  @@map("meal_times")
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+}
+
+model FoodItem {
+  id               BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  mealTimeId       BigInt   @map("meal_time_id") @db.UnsignedBigInt
+  foodMasterId     BigInt?  @map("food_master_id") @db.UnsignedBigInt
+  name             String   @db.VarChar(150)
+  portion          String   @db.VarChar(50)
+  portionGram      Int?     @map("portion_gram") @db.UnsignedSmallInt
+  calories         Int      @db.UnsignedSmallInt
+  proteinG         Decimal  @default(0) @map("protein_g") @db.Decimal(6, 2)
+  carbsG           Decimal  @default(0) @map("carbs_g") @db.Decimal(6, 2)
+  fatG             Decimal  @default(0) @map("fat_g") @db.Decimal(6, 2)
+  fiberG           Decimal  @default(0) @map("fiber_g") @db.Decimal(6, 2)
+  estimatedCostIdr Decimal  @default(0) @map("estimated_cost_idr") @db.Decimal(12, 2)
+  orderIndex       Int      @map("order_index") @db.UnsignedTinyInt
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamp()
+
+  mealTime   MealTime    @relation(fields: [mealTimeId], references: [id], onDelete: Cascade)
+  foodMaster FoodMaster? @relation(fields: [foodMasterId], references: [id], onDelete: SetNull)
+  mealLogs   MealLog[]
+
+  @@index([mealTimeId, orderIndex], map: "idx_food_items_meal_time")
+  @@map("food_items")
+}
+
+model WorkoutSession {
+  id                  BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  userId              BigInt        @map("user_id") @db.UnsignedBigInt
+  workoutDayId        BigInt        @map("workout_day_id") @db.UnsignedBigInt
+  startedAt           DateTime      @map("started_at") @db.Timestamp()
+  completedAt         DateTime?     @map("completed_at") @db.Timestamp()
+  durationSec         Int?          @map("duration_sec") @db.UnsignedInt
+  caloriesBurned      Int?          @map("calories_burned") @db.UnsignedSmallInt
+  effortScore         Int?          @map("effort_score") @db.UnsignedTinyInt
+  moodBefore          Mood?         @map("mood_before")
+  energyBefore        Int?          @map("energy_before") @db.UnsignedTinyInt
+  sleepBandBefore     SleepBand?    @map("sleep_band_before")
+  moodAfter           Mood?         @map("mood_after")
+  intensityMultiplier Decimal?      @map("intensity_multiplier") @db.Decimal(4, 2)
+  status              SessionStatus @default(IN_PROGRESS)
+  notes               String?       @db.Text
+  createdAt           DateTime      @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt           DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamp()
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workoutDay   WorkoutDay    @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
+  exerciseLogs ExerciseLog[]
+  dailyLogs    DailyLog[]
+
+  @@index([userId, startedAt], map: "idx_sessions_user_date")
+  @@index([workoutDayId], map: "idx_sessions_workout_day")
+  @@index([status], map: "idx_sessions_status")
+  @@map("workout_sessions")
+}
+
+enum Mood {
+  VERY_BAD
+  BAD
+  NEUTRAL
+  GOOD
+  VERY_GOOD
+}
+
+enum SleepBand {
+  LT5
+  B5_6
+  B6_7
+  B7_8
+  GT8
+}
+
+enum SessionStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+model ExerciseLog {
+  id                BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  sessionId         BigInt   @map("session_id") @db.UnsignedBigInt
+  exerciseId        BigInt   @map("exercise_id") @db.UnsignedBigInt
+  setNumber         Int      @map("set_number") @db.UnsignedTinyInt
+  repsActual        Int?     @map("reps_actual") @db.UnsignedSmallInt
+  durationActualSec Int?     @map("duration_actual_sec") @db.UnsignedSmallInt
+  weightKg          Decimal? @map("weight_kg") @db.Decimal(5, 2)
+  restActualSec     Int?     @map("rest_actual_sec") @db.UnsignedSmallInt
+  isCompleted       Boolean  @default(false) @map("is_completed")
+  loggedAt          DateTime @default(now()) @map("logged_at") @db.Timestamp()
+
+  workoutSession WorkoutSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  exercise       Exercise       @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, exerciseId, setNumber], map: "idx_exercise_logs_session")
+  @@map("exercise_logs")
+}
+
+model MealLog {
+  id                BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  userId            BigInt   @map("user_id") @db.UnsignedBigInt
+  mealTimeId        BigInt   @map("meal_time_id") @db.UnsignedBigInt
+  foodItemId        BigInt   @map("food_item_id") @db.UnsignedBigInt
+  loggedAt          DateTime @map("logged_at") @db.Timestamp()
+  actualPortionGram Int?     @map("actual_portion_gram") @db.UnsignedSmallInt
+  notes             String?  @db.VarChar(500)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamp()
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mealTime MealTime @relation(fields: [mealTimeId], references: [id], onDelete: Cascade)
+  foodItem FoodItem @relation(fields: [foodItemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mealTimeId, foodItemId], map: "uniq_meal_logs_user_time_food")
+  @@index([userId, loggedAt], map: "idx_meal_logs_user_date")
+  @@map("meal_logs")
+}
+
+model DailyLog {
+  id               BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  userId           BigInt   @map("user_id") @db.UnsignedBigInt
+  date             DateTime @db.Date
+  workoutCompleted Boolean  @default(false) @map("workout_completed")
+  workoutSessionId BigInt?  @map("workout_session_id") @db.UnsignedBigInt
+  mealsLoggedCount Int      @default(0) @map("meals_logged_count") @db.UnsignedTinyInt
+  mealsTotal       Int      @default(3) @map("meals_total") @db.UnsignedTinyInt
+  waterGlasses     Int      @default(0) @map("water_glasses") @db.UnsignedTinyInt
+  waterTarget      Int      @default(8) @map("water_target") @db.UnsignedTinyInt
+  mood             Mood?
+  dailyScore       Int?     @map("daily_score") @db.UnsignedTinyInt
+  caloriesConsumed Int?     @map("calories_consumed") @db.UnsignedSmallInt
+  caloriesBurned   Int?     @map("calories_burned") @db.UnsignedSmallInt
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp()
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workoutSession WorkoutSession? @relation(fields: [workoutSessionId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, date], map: "uniq_daily_logs_user_date")
+  @@map("daily_logs")
+}
+
+model Streak {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  userId         BigInt    @unique @map("user_id") @db.UnsignedBigInt
+  currentStreak  Int       @default(0) @map("current_streak") @db.UnsignedSmallInt
+  bestStreak     Int       @default(0) @map("best_streak") @db.UnsignedSmallInt
+  lastActiveDate DateTime? @map("last_active_date") @db.Date
+  activeDates    Json      @map("active_dates")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("streaks")
+}
+
+model Badge {
+  id             BigInt         @id @default(autoincrement()) @db.UnsignedBigInt
+  code           String         @unique @db.VarChar(50)
+  title          String         @db.VarChar(100)
+  description    String         @db.VarChar(500)
+  iconName       String         @map("icon_name") @db.VarChar(50)
+  iconColor      String?        @map("icon_color") @db.VarChar(7)
+  category       BadgeCategory
+  criterionType  BadgeCriterion @map("criterion_type")
+  criterionValue Int            @map("criterion_value")
+  orderIndex     Int            @map("order_index") @db.UnsignedSmallInt
+  isActive       Boolean        @default(true) @map("is_active")
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamp()
+
+  userBadges UserBadge[]
+
+  @@index([category, isActive], map: "idx_badges_category")
+  @@map("badges")
+}
+
+enum BadgeCategory {
+  STREAK
+  MILESTONE
+  GOAL
+  SPECIAL
+}
+
+enum BadgeCriterion {
+  STREAK
+  WORKOUTS_DONE
+  WEIGHT_LOST
+  MEALS_LOGGED
+  CUSTOM
+}
+
+model UserBadge {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  userId     BigInt   @map("user_id") @db.UnsignedBigInt
+  badgeId    BigInt   @map("badge_id") @db.UnsignedBigInt
+  unlockedAt DateTime @default(now()) @map("unlocked_at") @db.Timestamp()
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId], map: "uniq_user_badges_user_badge")
+  @@index([badgeId], map: "idx_user_badges_badge")
+  @@map("user_badges")
+}
+
+model Notification {
+  id        BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  userId    BigInt           @map("user_id") @db.UnsignedBigInt
+  type      NotificationType
+  title     String           @db.VarChar(150)
+  body      String           @db.VarChar(500)
+  actionUrl String?          @map("action_url") @db.VarChar(255)
+  isRead    Boolean          @default(false) @map("is_read")
+  readAt    DateTime?        @map("read_at") @db.Timestamp()
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamp()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt], map: "idx_notifications_user_unread")
+  @@map("notifications")
+}
+
+enum NotificationType {
+  MOTIVATION
+  WORKOUT_REMINDER
+  MEAL_REMINDER
+  STREAK_MILESTONE
+  BADGE_UNLOCKED
+  REPLAN_DUE
+}
+
+model SyncOpsLog {
+  id             BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  userId         BigInt     @map("user_id") @db.UnsignedBigInt
+  opId           String     @map("op_id") @db.VarChar(36)
+  opType         String     @map("op_type") @db.VarChar(50)
+  status         SyncStatus
+  resultSnapshot Json?      @map("result_snapshot")
+  createdAt      DateTime   @default(now()) @map("created_at") @db.Timestamp()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, opId], map: "uniq_sync_ops_user_op")
+  @@index([createdAt], map: "idx_sync_ops_created")
+  @@map("sync_ops_log")
+}
+
+enum SyncStatus {
+  OK
+  DUPLICATE
+  CONFLICT
+  ERROR
+}

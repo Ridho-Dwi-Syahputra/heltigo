@@ -30,4 +30,12 @@ export const authController = {
     // Implement refresh token logic using authService
     res.status(200).json({ accessToken: 'new-token' });
   }),
+
+  forgotPassword: asyncHandler(async (req: Request, res: Response) => {
+    res.json({ message: 'Pending forgot password logic' });
+  }),
+
+  resetPassword: asyncHandler(async (req: Request, res: Response) => {
+    res.json({ message: 'Pending reset password logic' });
+  }),
 };

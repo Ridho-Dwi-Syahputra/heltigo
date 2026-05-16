@@ -68,8 +68,8 @@ class _SetupBasicInfoScreenState extends State<SetupBasicInfoScreen> {
             colorScheme: const ColorScheme.dark(
               primary: AppColors.primary,
               onPrimary: AppColors.textOnPrimary,
-              surface: const Color(0xFF1A1A1A),
-              onSurface: const Color(0xFFF5F5F5),
+              surface: Color(0xFF1A1A1A),
+              onSurface: Color(0xFFF5F5F5),
             ),
             dialogTheme: DialogThemeData(
               backgroundColor: AppColors.surface,

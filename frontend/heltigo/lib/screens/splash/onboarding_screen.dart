@@ -83,6 +83,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             (_currentPage == _pages.length - 1 ? 46 : 0) +
             AppDimensions.xxl + bottomSafe;
 
+    // Adaptive colors for gradient overlay
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final gradientStartColor = isDark ? const Color(0x000D0D0D) : const Color(0x00F5F7FA);
+    final gradientEndColor = isDark ? const Color(0xFF0D0D0D) : const Color(0xFFF5F7FA);
+
     return Scaffold(
       body: Stack(
         children: [
@@ -124,13 +129,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             right: 0,
             bottom: 0,
             child: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color(0x000D0D0D),
-                    Color(0xFF0D0D0D),
+                    gradientStartColor,
+                    gradientEndColor,
                   ],
-                  stops: [0.0, 0.35],
+                  stops: const [0.0, 0.35],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -244,6 +249,9 @@ class _OnboardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Adaptive colors for image overlay gradient
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenHeight = constraints.maxHeight;
@@ -269,15 +277,22 @@ class _OnboardingPage extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                   Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [
-                          Color(0x00000000),
-                          Color(0x330D0D0D),
-                          Color(0xCC0D0D0D),
-                          Color(0xFF0D0D0D),
-                        ],
-                        stops: [0.0, 0.5, 0.75, 1.0],
+                        colors: isDark
+                            ? const [
+                                Color(0x00000000),
+                                Color(0x330D0D0D),
+                                Color(0xCC0D0D0D),
+                                Color(0xFF0D0D0D),
+                              ]
+                            : const [
+                                Color(0x00000000),
+                                Color(0x33F5F7FA),
+                                Color(0xCCF5F7FA),
+                                Color(0xFFF5F7FA),
+                              ],
+                        stops: const [0.0, 0.5, 0.75, 1.0],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ),

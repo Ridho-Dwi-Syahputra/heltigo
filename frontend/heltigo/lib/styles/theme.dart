@@ -196,19 +196,20 @@ class AppTheme {
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    scaffoldBackgroundColor: AppColors.background,
+    scaffoldBackgroundColor: const Color(0xFF0D0D0D),
 
     // Color Scheme — hardcoded dark values (AppColors adaptive getters can't be const)
-    colorScheme: ColorScheme.dark(
+    colorScheme: const ColorScheme.dark(
       primary: AppColors.primary,
       primaryContainer: AppColors.primaryMuted,
       secondary: AppColors.accent,
-      surface: const Color(0xFF1A1A1A),
+      surface: Color(0xFF1A1A1A),
+      surfaceContainerHighest: Color(0xFF0D0D0D),
       error: AppColors.error,
       onPrimary: AppColors.textOnPrimary,
-      onSurface: const Color(0xFFF5F5F5),
+      onSurface: Color(0xFFF5F5F5),
       onError: AppColors.white,
-      outline: const Color(0xFF333333),
+      outline: Color(0xFF333333),
     ),
 
     // Typography
@@ -241,7 +242,7 @@ class AppTheme {
     // Input — hardcoded dark values (adaptive via InputDecorationTheme is static)
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: const Color(0xFF242424),
+      fillColor: const Color(0xFF1F1F1F),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppDimensions.radiusInput),
@@ -273,7 +274,7 @@ class AppTheme {
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
-        disabledBackgroundColor: const Color(0xFF242424),
+        disabledBackgroundColor: const Color(0xFF1F1F1F),
         disabledForegroundColor: const Color(0xFF707070),
         minimumSize: const Size.fromHeight(AppDimensions.buttonHeight),
         shape: RoundedRectangleBorder(
@@ -333,7 +334,7 @@ class AppTheme {
 
     // Bottom Sheet
     bottomSheetTheme: const BottomSheetThemeData(
-      backgroundColor: Color(0xFF2A2A2A),
+      backgroundColor: Color(0xFF1A1A1A),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppDimensions.radiusBottomSheetTop),
@@ -361,7 +362,7 @@ class AppTheme {
     // Progress Indicator
     progressIndicatorTheme: const ProgressIndicatorThemeData(
       color: AppColors.primary,
-      linearTrackColor: Color(0xFF242424),
+      linearTrackColor: Color(0xFF1F1F1F),
     ),
 
     // Switch

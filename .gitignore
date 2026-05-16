@@ -116,10 +116,12 @@ nosetests.xml
 coverage.xml
 *.cover
 
-# ─── Dataset > 100MB (GitHub limit) ──────────────────────────
-# programs_detailed_boostcamp_kaggle.csv is 282MB — download from
-# Kaggle: https://www.kaggle.com/datasets/...
+# ─── Dataset (tidak perlu di-push) ──────────────────────────
 notebook/dataset/Model_rekomendasi_Pelatihan/600K+ Fitness Exercise & Workout Program Dataset/programs_detailed_boostcamp_kaggle.csv
+machine-learning/notebook/dataset/
+
+# ─── File > 50MB (GitHub limit) ─────────────────────────────
+machine-learning/notebook/training_model/Model_Analisa_Makanan/output/models/food_name_matrix.npy
 
 # ─── ML Output Artifacts (regenerable from notebooks) ────────
 # Keep small outputs (json/png) for showcase, exclude large pkl/parquet

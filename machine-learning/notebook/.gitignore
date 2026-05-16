@@ -29,8 +29,6 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-dataset
-
 # Optuna study (besar, regenerable)
 *.db
 

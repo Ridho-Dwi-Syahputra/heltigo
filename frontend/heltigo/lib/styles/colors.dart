@@ -41,10 +41,10 @@ class AppColors {
       _dark ? const Color(0xFF1A1A1A) : const Color(0xFFFFFFFF);
 
   static Color get surfaceLight =>
-      _dark ? const Color(0xFF242424) : const Color(0xFFEEF0F4);
+      _dark ? const Color(0xFF1F1F1F) : const Color(0xFFEEF0F4);
 
   static Color get surfaceElevated =>
-      _dark ? const Color(0xFF2A2A2A) : const Color(0xFFE4E7EC);
+      _dark ? const Color(0xFF242424) : const Color(0xFFE4E7EC);
 
   // ═══════════════════════════════════════
   // ADAPTIVE BORDERS & DIVIDERS

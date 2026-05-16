@@ -119,13 +119,23 @@ class _MealListScreenState extends State<MealListScreen> {
       lastDate: _planEndDate,
       helpText: 'Pilih hari dalam plan ini',
       builder: (context, child) {
+        // Use Theme.of(context).brightness to get current theme brightness
+        final brightness = Theme.of(context).brightness;
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme(
+              brightness: brightness,
               primary: AppColors.primary,
               onPrimary: AppColors.textOnPrimary,
-              surface: const Color(0xFF1A1A1A),
-              onSurface: const Color(0xFFF5F5F5),
+              surface: AppColors.surface,
+              onSurface: AppColors.textPrimary,
+              // Required ColorScheme properties
+              secondary: AppColors.primary,
+              onSecondary: AppColors.textOnPrimary,
+              error: AppColors.error,
+              onError: AppColors.white,
+              background: AppColors.background,
+              onBackground: AppColors.textPrimary,
             ),
           ),
           child: child!,

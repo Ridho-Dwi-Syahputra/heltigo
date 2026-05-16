@@ -1,6 +1,6 @@
 # Heltigo — AI-Powered Personal Health & Fitness
 
-> Aplikasi mobile yang menyediakan rekomendasi workout & meal personal berbasis AI, serta adaptive weekly replanning. Dibangun untuk **MSU iREX 2026** hackathon.
+> Aplikasi mobile yang menyediakan rekomendasi workout & meal personal berbasis AI, serta adaptive weekly replanning. Dibangun untuk hackathon.
 
 **Demo target:** 2026-05-21
 **Tech:** Flutter (mobile) + Express.js/MySQL (backend) + Python FastAPI ML (microservice)

@@ -1,0 +1,172 @@
+# ═════════════════════════════════════════════════════════════
+# Heltigo — Root .gitignore
+# ═════════════════════════════════════════════════════════════
+
+# ─── OS Files ─────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+
+# ─── IDE / Editor ─────────────────────────────────────────────
+.vscode/
+.idea/
+.qodo/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# ─── Claude Code / AI ─────────────────────────────────────────
+.claude/
+
+# ─── Logs ─────────────────────────────────────────────────────
+*.log
+hs_err_pid*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── Archives (sudah ada extracted version di docs/) ──────────
+docs.zip
+
+# ═════════════════════════════════════════════════════════════
+# FLUTTER (frontend/heltigo/)
+# ═════════════════════════════════════════════════════════════
+
+# Build outputs (944MB — regenerable via flutter build)
+frontend/heltigo/build/
+
+# Flutter cache
+frontend/heltigo/.dart_tool/
+frontend/heltigo/.flutter-plugins
+frontend/heltigo/.flutter-plugins-dependencies
+frontend/heltigo/.packages
+frontend/heltigo/.pub-cache/
+frontend/heltigo/.pub/
+
+# Symbolication info
+frontend/heltigo/app.*.symbols
+frontend/heltigo/app.*.map.json
+
+# Generated Flutter / iOS / Android
+frontend/heltigo/ios/Flutter/Generated.xcconfig
+frontend/heltigo/ios/Flutter/flutter_export_environment.sh
+frontend/heltigo/ios/Pods/
+frontend/heltigo/ios/.symlinks/
+frontend/heltigo/ios/Runner/GeneratedPluginRegistrant.*
+frontend/heltigo/macos/Pods/
+frontend/heltigo/macos/Flutter/GeneratedPluginRegistrant.swift
+frontend/heltigo/macos/Flutter/ephemeral/
+
+# Android build & secrets
+frontend/heltigo/android/.gradle/
+frontend/heltigo/android/captures/
+frontend/heltigo/android/gradlew
+frontend/heltigo/android/gradlew.bat
+frontend/heltigo/android/local.properties
+frontend/heltigo/android/key.properties
+frontend/heltigo/android/**/gradle-wrapper.jar
+frontend/heltigo/android/app/release/
+frontend/heltigo/android/app/profile/
+frontend/heltigo/android/app/debug/
+frontend/heltigo/android/.kotlin/
+
+# Coverage
+frontend/heltigo/coverage/
+
+# IDE
+frontend/heltigo/.vscode/
+frontend/heltigo/.idea/
+frontend/heltigo/heltigo.iml
+
+# ═════════════════════════════════════════════════════════════
+# PYTHON / ML (notebook/)
+# ═════════════════════════════════════════════════════════════
+
+# Virtual environment (~2GB — regenerable via `pip install -r requirements.txt`)
+notebook/.venv/
+notebook/venv/
+notebook/env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+*.so
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+notebook/profile_default/
+notebook/ipython_config.py
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+
+# ─── Dataset > 100MB (GitHub limit) ──────────────────────────
+# programs_detailed_boostcamp_kaggle.csv is 282MB — download from
+# Kaggle: https://www.kaggle.com/datasets/...
+notebook/dataset/Model_rekomendasi_Pelatihan/600K+ Fitness Exercise & Workout Program Dataset/programs_detailed_boostcamp_kaggle.csv
+
+# ─── ML Output Artifacts (regenerable from notebooks) ────────
+# Keep small outputs (json/png) for showcase, exclude large pkl/parquet
+notebook/training_model/*/output/models/*.pkl
+notebook/training_model/*/output/preprocessed/*.parquet
+notebook/training_model/*/output/preprocessed/*.csv
+notebook/training_model/*/output/eda/*.csv
+
+# Optuna study (can be large)
+*.db
+optuna_study*.pkl
+
+# ─── Distribution / packaging ────────────────────────────────
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+
+# ═════════════════════════════════════════════════════════════
+# Node.js / Backend (kalau nanti ditambah)
+# ═════════════════════════════════════════════════════════════
+node_modules/
+.npm
+.eslintcache
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# ═════════════════════════════════════════════════════════════
+# Secrets (jangan pernah commit)
+# ═════════════════════════════════════════════════════════════
+*.pem
+*.key
+*.p12
+*.pfx
+*.cert
+.env*
+!.env.example
+credentials.json
+secrets.json
+config.local.*
+firebase-service-account.json
+google-services.json
+GoogleService-Info.plist

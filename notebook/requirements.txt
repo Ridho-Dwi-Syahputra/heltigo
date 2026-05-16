@@ -1,0 +1,45 @@
+# Heltigo ML — Python Dependencies
+# Stack: SOTA 2024-2025 (XGBoost + Optuna + SMOTEENN + GA)
+# Python 3.11+
+
+# ─── Core ML ───────────────────────────────────────────
+numpy>=1.26,<2.0
+pandas>=2.2
+scikit-learn>=1.4
+
+# ─── Gradient Boosting (primary, replace RandomForest) ─
+xgboost>=2.0
+lightgbm>=4.0
+
+# ─── Hyperparameter Tuning ─────────────────────────────
+optuna>=3.5
+
+# ─── Imbalanced Data (SMOTE, SMOTEENN, ADASYN) ─────────
+imbalanced-learn>=0.12
+
+# ─── Multi-label CV ─────────────────────────────────────
+iterative-stratification>=0.1.7
+
+# ─── Optimization (Knapsack + Genetic Algorithm) ───────
+pulp>=2.7
+deap>=1.4
+
+# ─── Indonesian NLP (Phase 2 — IndoBERT/NusaBERT) ──────
+# Heavy deps (~1.5GB). Comment out kalau tidak perlu IndoBERT.
+transformers>=4.36
+torch>=2.1
+sentencepiece>=0.1.99
+protobuf>=4.21
+
+# ─── Visualization ─────────────────────────────────────
+matplotlib>=3.8
+seaborn>=0.13
+plotly>=5.18
+
+# ─── Notebook & I/O ────────────────────────────────────
+jupyter>=1.0
+ipykernel>=6.25
+joblib>=1.3
+pyarrow>=14.0
+openpyxl>=3.1
+tqdm>=4.66

@@ -1,0 +1,76 @@
+name: heltigo
+description: "Heltigo — AI-Powered Personal Health & Fitness App."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # Routing
+  go_router: ^14.6.2
+
+  # State Management & Dependency Injection
+  provider: ^6.1.2
+  get_it: ^8.0.3
+
+  # HTTP Client
+  dio: ^5.7.0
+
+  # Local Storage
+  shared_preferences: ^2.3.5
+  flutter_secure_storage: ^9.2.4
+
+  # UI
+  google_fonts: ^6.2.1
+  fl_chart: ^0.70.2
+  flutter_svg: ^2.0.17
+
+  # Connectivity
+  connectivity_plus: ^6.1.4
+
+  # Utilities
+  intl: ^0.20.2
+  uuid: ^4.5.1
+  collection: ^1.19.1
+  wakelock_plus: ^1.2.11
+  share_plus: ^10.1.4
+
+  # Logging
+  logger: ^2.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/logo/
+    - assets/screen/onboarding/
+
+# ═══════════════════════════════════════
+# App Icon Configuration (flutter_launcher_icons)
+# ═══════════════════════════════════════
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo/logo_polos.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/logo/logo_polos.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: "assets/logo/logo_polos.png"
+    background_color: "#FFFFFF"
+    theme_color: "#1D6766"

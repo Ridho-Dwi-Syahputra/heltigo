@@ -165,7 +165,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
               physics: const NeverScrollableScrollPhysics(),
               mainAxisSpacing: AppDimensions.sm,
               crossAxisSpacing: AppDimensions.sm,
-              childAspectRatio: 1.8,
+              childAspectRatio: 1.45,
               children: const [
                 _StatCard(
                   icon: Icons.fitness_center,
@@ -585,7 +585,7 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.md),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.sm + 2, vertical: AppDimensions.sm),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppDimensions.radiusCard),

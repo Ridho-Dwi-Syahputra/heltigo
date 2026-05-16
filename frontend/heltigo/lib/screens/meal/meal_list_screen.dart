@@ -134,8 +134,8 @@ class _MealListScreenState extends State<MealListScreen> {
               onSecondary: AppColors.textOnPrimary,
               error: AppColors.error,
               onError: AppColors.white,
-              background: AppColors.background,
-              onBackground: AppColors.textPrimary,
+              // Use surface instead of deprecated background
+              surfaceContainerHighest: AppColors.background,
             ),
           ),
           child: child!,

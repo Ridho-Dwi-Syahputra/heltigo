@@ -77,11 +77,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     // Tinggi area bottom: dots + spacing + button + sign-in (opsional) + safe.
     final bottomSafe = MediaQuery.of(context).padding.bottom;
-    // Reserve: dots (10) + xl spacing + button + base padding + opsional sign-in row (~46) + bottomSafe + xxl
+    // Reserve: dots + gap + button + sign-in (optional) + extra buffer + bottomSafe
     final reservedBottom =
-        10 + AppDimensions.xl + AppDimensions.buttonHeight +
-            (_currentPage == _pages.length - 1 ? 46 : 0) +
-            AppDimensions.xxl + bottomSafe;
+        20 + AppDimensions.xl + AppDimensions.buttonHeight +
+            (_currentPage == _pages.length - 1 ? 56 : 0) +
+            AppDimensions.xxl + AppDimensions.lg + bottomSafe;
 
     // Adaptive colors for gradient overlay
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -255,10 +255,17 @@ class _OnboardingPage extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenHeight = constraints.maxHeight;
-        // Image scale: 55% untuk layar besar, turun jadi 45% untuk layar kecil
-        // supaya teks tetap kebaca.
-        final imageRatio = screenHeight < 700 ? 0.42 : 0.50;
+        // Image ratio — max 42% agar text punya cukup ruang
+        final imageRatio = screenHeight < 600 ? 0.32
+                         : screenHeight < 700 ? 0.38
+                         : 0.42;
         final imageHeight = screenHeight * imageRatio;
+
+        // Font sizes lebih kecil supaya description tidak tertutup
+        final titleFontSize = screenHeight < 600 ? 18.0
+                            : screenHeight < 700 ? 20.0
+                            : 22.0;
+        final descriptionFontSize = screenHeight < 600 ? 12.0 : 13.0;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -320,14 +327,18 @@ class _OnboardingPage extends StatelessWidget {
                       data.title,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.onboardingTitle,
+                      style: AppTextStyles.onboardingTitle.copyWith(
+                        fontSize: titleFontSize,
+                      ),
                     ),
                     const SizedBox(height: AppDimensions.md),
                     Text(
                       data.description,
-                      maxLines: 6,
+                      maxLines: 4,
                       overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.onboardingDesc,
+                      style: AppTextStyles.onboardingDesc.copyWith(
+                        fontSize: descriptionFontSize,
+                      ),
                     ),
                   ],
                 ),

@@ -4,8 +4,8 @@
 /// Input:
 /// - Pilih goal: Turunkan Berat / Jaga Berat / Naikkan Massa Otot
 /// - Target Berat (kg) — muncul jika goal != 'Jaga'
-/// - Timeline (4-52 minggu) — slider dengan card preview
-/// - Calorie deficit info card (auto-calculated, mock dulu)
+/// - Timeline is determined by ML (not user input)
+/// - Calorie adjustment is calculated by ML backend
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../styles/styles.dart';
@@ -23,7 +23,6 @@ class SetupGoalScreen extends StatefulWidget {
 class _SetupGoalScreenState extends State<SetupGoalScreen> {
   _Goal? _selectedGoal;
   final _targetWeightController = TextEditingController(text: '68');
-  double _timelineWeeks = 16;
 
   @override
   void dispose() {
@@ -31,28 +30,17 @@ class _SetupGoalScreenState extends State<SetupGoalScreen> {
     super.dispose();
   }
 
-  /// Mock calorie deficit/surplus calculation (rule of thumb).
-  /// 0.5 kg/minggu ≈ 500 kkal/hari defisit.
-  int get _calorieAdjustment {
-    if (_selectedGoal == _Goal.maintain) return 0;
-    // Mock: tergantung timeline, rate ±0.5 kg/minggu = ±500 kkal/hari
-    final perWeek = 0.5; // kg per minggu
-    final daily = (perWeek * 7700 / 7).round(); // 1 kg = 7700 kkal
-    return _selectedGoal == _Goal.lose ? -daily : daily;
-  }
-
   bool get _canContinue => _selectedGoal != null;
 
   void _onContinue() {
-    // TODO: Save goal, target weight, timeline ke ProfileProvider
+    // TODO: Save goal and target weight to ProfileProvider
+    // Timeline will be determined by ML backend
     context.push('/setup-conditions');
   }
 
   @override
   Widget build(BuildContext context) {
     final showTargetWeight = _selectedGoal != null && _selectedGoal != _Goal.maintain;
-    final calAdj = _calorieAdjustment;
-    final isWarning = calAdj.abs() > 600;
 
     return SetupScaffold(
       currentStep: 4,
@@ -118,142 +106,6 @@ class _SetupGoalScreenState extends State<SetupGoalScreen> {
                 ),
                 suffixText: 'kg',
                 suffixStyle: TextStyle(color: AppColors.textTertiary),
-              ),
-            ),
-          ],
-
-          // ═══════════════════════════════════════
-          // TIMELINE CARD
-          // ═══════════════════════════════════════
-          if (_selectedGoal != null && _selectedGoal != _Goal.maintain) ...[
-            const SizedBox(height: AppDimensions.lg),
-            Container(
-              padding: const EdgeInsets.all(AppDimensions.base),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'TIMELINE TARGET',
-                    style: AppTextStyles.overline.copyWith(
-                      color: AppColors.textTertiary,
-                    ),
-                  ),
-                  const SizedBox(height: AppDimensions.sm),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        _timelineWeeks.round().toString(),
-                        style: AppTextStyles.numberBold.copyWith(
-                          fontSize: 40,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      const SizedBox(width: AppDimensions.sm),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Text(
-                          'Minggu',
-                          style: AppTextStyles.bodyLarge.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    '±0.5 kg/minggu = ±${(_timelineWeeks * 0.5).toStringAsFixed(0)} kg total',
-                    style: AppTextStyles.caption,
-                  ),
-                  const SizedBox(height: AppDimensions.sm),
-                  SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: AppColors.primary,
-                      inactiveTrackColor: AppColors.surfaceLight,
-                      thumbColor: AppColors.primary,
-                      overlayColor: AppColors.primaryMuted,
-                      trackHeight: 4,
-                    ),
-                    child: Slider(
-                      min: 4,
-                      max: 52,
-                      divisions: 48,
-                      value: _timelineWeeks,
-                      onChanged: (v) => setState(() => _timelineWeeks = v),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-
-          // ═══════════════════════════════════════
-          // CALORIE INFO CARD
-          // ═══════════════════════════════════════
-          if (_selectedGoal != null && _selectedGoal != _Goal.maintain) ...[
-            const SizedBox(height: AppDimensions.md),
-            Container(
-              padding: const EdgeInsets.all(AppDimensions.base),
-              decoration: BoxDecoration(
-                color: isWarning ? AppColors.warningMuted : AppColors.accentMuted,
-                borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                border: Border.all(
-                  color: isWarning ? AppColors.warning : AppColors.accent,
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.local_fire_department,
-                    color: isWarning ? AppColors.warning : AppColors.accent,
-                    size: 20,
-                  ),
-                  const SizedBox(width: AppDimensions.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        RichText(
-                          text: TextSpan(
-                            style: AppTextStyles.body.copyWith(
-                              color: AppColors.textPrimary,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: _selectedGoal == _Goal.lose
-                                    ? 'Target defisit: '
-                                    : 'Target surplus: ',
-                              ),
-                              TextSpan(
-                                text: '${calAdj.abs()} kkal/hari',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  color: isWarning
-                                      ? AppColors.warning
-                                      : AppColors.accent,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          isWarning
-                              ? 'Defisit terlalu agresif — pertimbangkan timeline lebih panjang.'
-                              : 'Aman dan berkelanjutan.',
-                          style: AppTextStyles.caption,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
               ),
             ),
           ],

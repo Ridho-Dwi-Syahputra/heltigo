@@ -233,7 +233,7 @@ class WorkoutSessionDetailScreen extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     mainAxisSpacing: AppDimensions.sm,
                     crossAxisSpacing: AppDimensions.sm,
-                    childAspectRatio: 1.7,
+                    childAspectRatio: 1.35,
                     children: const [
                       _StatTile(
                         icon: Icons.schedule,
@@ -457,7 +457,7 @@ class _StatTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.md),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.sm + 2, vertical: AppDimensions.sm),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
@@ -466,51 +466,63 @@ class _StatTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius:
-                  BorderRadius.circular(AppDimensions.radiusSmall),
+          Flexible(
+            flex: 0,
+            child: Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                borderRadius:
+                    BorderRadius.circular(AppDimensions.radiusSmall),
+              ),
+              child: Icon(icon, size: 16, color: color),
             ),
-            child: Icon(icon, size: 16, color: color),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: RichText(
-                  text: TextSpan(
-                    style: AppTextStyles.h2.copyWith(
-                      color: AppColors.textPrimary,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                    ),
-                    children: [
-                      TextSpan(text: value),
-                      TextSpan(
-                        text: ' $unit',
-                        style: AppTextStyles.caption.copyWith(
-                          color: AppColors.textTertiary,
-                          fontWeight: FontWeight.w500,
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: RichText(
+                      text: TextSpan(
+                        style: AppTextStyles.h2.copyWith(
+                          color: AppColors.textPrimary,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
                         ),
+                        children: [
+                          TextSpan(text: value),
+                          TextSpan(
+                            text: ' $unit',
+                            style: AppTextStyles.caption.copyWith(
+                              color: AppColors.textTertiary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
-              ),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.caption,
-              ),
-            ],
+                Flexible(
+                  flex: 0,
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.caption,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

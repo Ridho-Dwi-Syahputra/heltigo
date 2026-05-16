@@ -61,6 +61,7 @@ class _MainScaffoldState extends State<MainScaffold> {
           ),
         ),
         child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
           currentIndex: _currentIndex,
           onTap: (index) => setState(() => _currentIndex = index),
           items: const [

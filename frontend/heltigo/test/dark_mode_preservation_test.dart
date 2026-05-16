@@ -449,7 +449,7 @@ void main() {
         if (lightModeColors[key] != darkModeColors[key]) {
           allMatch = false;
           mismatchCount++;
-          print('MISMATCH: $key - Light: ${lightModeColors[key]}, Dark: ${darkModeColors[key]}');
+          debugPrint('MISMATCH: $key - Light: ${lightModeColors[key]}, Dark: ${darkModeColors[key]}');
         }
       }
 
@@ -492,7 +492,7 @@ void main() {
         if (lightModeColors[key] == darkModeColors[key]) {
           allDifferent = false;
           sameCount++;
-          print('SAME: $key - Light: ${lightModeColors[key]}, Dark: ${darkModeColors[key]}');
+          debugPrint('SAME: $key - Light: ${lightModeColors[key]}, Dark: ${darkModeColors[key]}');
         }
       }
 

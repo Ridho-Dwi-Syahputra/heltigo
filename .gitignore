@@ -128,9 +128,7 @@ notebook/training_model/*/output/preprocessed/*.parquet
 notebook/training_model/*/output/preprocessed/*.csv
 notebook/training_model/*/output/eda/*.csv
 
-# Optuna study (can be large)
-*.db
-optuna_study*.pkl
+
 
 # ─── Distribution / packaging ────────────────────────────────
 build/

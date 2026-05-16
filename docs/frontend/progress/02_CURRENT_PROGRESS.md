@@ -1,9 +1,17 @@
 # Progress Laporan: Kondisi Aplikasi & Implementasi Screen
 
-**Tanggal terakhir update:** 15 Mei 2026
+**Tanggal terakhir update:** 16 Mei 2026
 **Status:** 🚀 Dalam Pengembangan Aktif
 **Tema Aktif:** Dark Mode (Teal #1D6766 & Orange #FB3A01)
 
+> 📌 **Sprint update 2026-05-16 (ML Fix):**
+> - ✅ **Workout Recommender**: Switched dari XGBoost (F1=0.23, gagal) ke **Rule-Based Engine** — 5/5 test cases PASSED
+> - ✅ **Meal Planner**: Calorie deviation diperbaiki dari **48.7% → 4.9%** (target ≤15% — MET!)
+> - ✅ **Adaptive Replanner**: Sudah memenuhi target (MAE=0.026, R²=0.965)
+> - ✅ **Data Cleaning**: Dataset gym_members verified clean (973 rows)
+> - ⚠️ **Known issue**: Macro balance masih rendah (protein%), budget Rp25K undershoot
+> - 📄 Detail: [`docs/machine-learning/progress/01_ML_FIX_REPORT.md`](../../machine-learning/progress/01_ML_FIX_REPORT.md)
+>
 > 📌 **Sprint update 2026-05-15:**
 > - ✅ **S-21b Workout Session Detail** — selesai, terhubung dari S-21 "Lihat Detail"
 > - ✅ **Replanning flow** 4 screens (S-34, S-34b, S-34c, S-35) — selesai + routes wired
@@ -63,11 +71,35 @@ Semua screen di atas dibangun menggunakan komponen *Universal* yang sudah diranc
 
 ---
 
-## 4. Next Step (Langkah Selanjutnya)
+## 4. Status Machine Learning (Update 16 Mei 2026)
 
-Setelah implementasi UI Splash, Onboarding, dan Login Screen selesai, langkah logis selanjutnya dalam pengembangan meliputi:
+### Model 1 — Rekomendasi Latihan: ✅ Rule-Based Engine
+- **Sebelumnya:** XGBoost, F1=0.23 (≈ random), gagal setelah 2 round debugging
+- **Sekarang:** Rule engine deterministik — 12 templates × BMI/condition overrides
+- **Validasi:** 5/5 test cases PASSED (beginner, obese, advanced, underweight, hamil)
+- **File:** `notebook/training_model/Model_Rekomendasi_Latihan/rule_engine_workout.py`
 
+### Model 2 — Perencana Makan: ✅ Calorie Fixed
+- **Sebelumnya:** Calorie deviation 48.7%
+- **Sekarang:** Calorie deviation **4.9%** (target ≤15% — MET!)
+- **Metode:** Multi-pass knapsack + normalisasi porsi + fractional serving
+- **File:** `notebook/training_model/Model_Perencana_Makan/fix_meal_planner.py`
+
+### Model 3 — Adaptive Replanner: ✅ Sudah Lulus
+- MAE = 0.026 (target < 0.04), R² = 0.965 (target > 0.90)
+- Rule 3-cabang + XGBoost fine-tune multiplier
+
+---
+
+## 5. Next Step (Langkah Selanjutnya)
+
+### Frontend
 1. **Implementasi UI Auth Lainnya:** Pembuatan UI untuk `RegisterScreen` (S-04) dan `ForgotPasswordScreen` (S-05).
 2. **Setup Profile Wizard:** Membangun *flow* pengisian data personal (S-06 hingga S-09) untuk menghitung preferensi olahraga pengguna baru.
 3. **Koneksi State Management:** Mengaktifkan tombol "Masuk" pada halaman Login menggunakan `AuthProvider` untuk menembak API dan menyimpan *Auth Token* ke dalam `SecureStorage`.
 4. **Implementasi Main Scaffold:** Mengaktifkan *Bottom Navigation Bar* (S-35) yang sudah dibuat, untuk mengakses halaman utama Home, Workout, Meal, dan Progress.
+
+### Machine Learning
+1. **Macro balance improvement** — boost protein scoring weight di meal planner
+2. **FastAPI integration** — copy fix scripts ke `heltigo-ml-service/app/services/`
+3. **E2E smoke test** — Flutter ↔ Backend ↔ ML service

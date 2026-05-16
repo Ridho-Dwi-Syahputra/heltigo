@@ -1,0 +1,36 @@
+# Python virtualenv
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+
+# EDA & evaluation outputs (regenerable, but optional commit)
+# Uncomment kalau mau exclude:
+# training_model/*/output/eda/*.png
+# training_model/*/output/evaluation/*.png
+
+# Dataset (kalau berat, bisa exclude)
+# dataset/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Optuna study (besar, regenerable)
+*.db
+
+# Logs
+*.log

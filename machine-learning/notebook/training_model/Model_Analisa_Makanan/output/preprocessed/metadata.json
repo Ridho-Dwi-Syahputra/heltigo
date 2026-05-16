@@ -1,0 +1,10 @@
+{
+  "vectorizer_type": "TF-IDF char_wb n-gram (2,4)",
+  "n_foods": 1346,
+  "vocab_size": 5141,
+  "alias_entries": 97,
+  "match_threshold": 0.2,
+  "ood_threshold": 0.4,
+  "top_k_default": 3,
+  "inference_note": "food_name_matrix.npy pre-computed, inference <5ms"
+}

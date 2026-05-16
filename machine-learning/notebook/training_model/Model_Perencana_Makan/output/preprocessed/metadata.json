@@ -1,0 +1,44 @@
+{
+  "n_foods": 1346,
+  "columns": [
+    "id",
+    "slug",
+    "name",
+    "category",
+    "cuisine",
+    "calories_per_portion",
+    "protein_g",
+    "fat_g",
+    "carbs_g",
+    "estimated_price_idr",
+    "is_halal",
+    "is_vegetarian",
+    "is_vegan",
+    "is_gluten_free",
+    "image_url",
+    "base_portion",
+    "base_portion_gram",
+    "fiber_g",
+    "is_active"
+  ],
+  "category_counts": {
+    "STAPLE": 667,
+    "PROTEIN": 321,
+    "VEGETABLE": 157,
+    "FRUIT": 100,
+    "DESSERT": 49,
+    "BEVERAGE": 29,
+    "SNACK": 23
+  },
+  "cuisine_counts": {
+    "INDONESIAN_GENERAL": 1282,
+    "INDONESIAN_PADANG": 27,
+    "INDONESIAN_JAVA": 24,
+    "INDONESIAN_SUNDA": 8,
+    "WESTERN": 3,
+    "ASIAN": 2
+  },
+  "halal_count": 1327,
+  "vegetarian_count": 1068,
+  "augmentation_done": true
+}

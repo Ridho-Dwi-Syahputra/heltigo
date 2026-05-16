@@ -1,0 +1,49 @@
+{
+  "version": "v3-dynamic-budget",
+  "min_budget_idr": 10000,
+  "calorie_deviation_avg_pct": 8.66,
+  "calorie_deviation_max_pct": 25.0,
+  "budget_compliance": "21/35",
+  "target_met": true,
+  "improvement_vs_v1": {
+    "v1_avg_deviation": 48.74,
+    "v3_avg_deviation": 8.66
+  },
+  "per_profile": {
+    "Ultra Low (10K) \u2014 Weight Loss": {
+      "budget_per_day": 10000,
+      "budget_tier": "LOW",
+      "avg_cal_deviation": 25.0,
+      "max_cal_deviation": 25.0,
+      "budget_compliance": "0/7"
+    },
+    "Low Budget (15K) \u2014 Maintenance": {
+      "budget_per_day": 15000,
+      "budget_tier": "LOW",
+      "avg_cal_deviation": 6.44,
+      "max_cal_deviation": 6.44,
+      "budget_compliance": "0/7"
+    },
+    "Budget (25K) \u2014 Weight Loss": {
+      "budget_per_day": 25000,
+      "budget_tier": "MID",
+      "avg_cal_deviation": 4.71,
+      "max_cal_deviation": 4.71,
+      "budget_compliance": "7/7"
+    },
+    "Mid Budget (40K) \u2014 Maintenance": {
+      "budget_per_day": 40000,
+      "budget_tier": "MID",
+      "avg_cal_deviation": 3.05,
+      "max_cal_deviation": 3.05,
+      "budget_compliance": "7/7"
+    },
+    "High Budget (75K) \u2014 Muscle Gain": {
+      "budget_per_day": 75000,
+      "budget_tier": "HIGH",
+      "avg_cal_deviation": 4.12,
+      "max_cal_deviation": 4.12,
+      "budget_compliance": "7/7"
+    }
+  }
+}

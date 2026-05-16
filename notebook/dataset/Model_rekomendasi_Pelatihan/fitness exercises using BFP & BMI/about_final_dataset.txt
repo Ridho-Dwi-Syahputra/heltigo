@@ -1,9 +1,0 @@
-This fitness dataset provides personalized exercise plans tailored to individuals' physical features, activity levels, and gender. It is designed to assist individuals in achieving their fitness goals by offering customized workout routines that optimize effectiveness and safety.
-
-Key Features:
-
-Physical Features: The dataset includes physical attributes such as height (h), weight (w), body mass index (BMI), body fat percentage, muscle mass, and other relevant metrics. These features are crucial for determining an individual's baseline fitness level and guiding exercise recommendations.
-Gender: Gender is an essential factor in designing personalized exercise plans. The dataset categorizes individuals into different gender groups to account for physiological differences and tailor workouts accordingly.
-Activity Levels: The dataset captures information about individuals' activity levels, including their daily physical activity, exercise frequency, intensity, and duration. Understanding activity levels helps in prescribing appropriate workout regimens that align with individuals' lifestyles and fitness goals.
-Exercise Preferences: Individuals may have preferences for specific types of exercises, such as cardio, strength training, flexibility, or endurance activities. The dataset includes information about exercise preferences to ensure that recommended workout plans are enjoyable and sustainable.
-Fitness Goals: The dataset allows individuals to set personalized fitness goals, such as weight loss, muscle gain, improved endurance, or overall health and wellness. Exercise plans are tailored to help individuals achieve their specific objectives effectively and efficiently.

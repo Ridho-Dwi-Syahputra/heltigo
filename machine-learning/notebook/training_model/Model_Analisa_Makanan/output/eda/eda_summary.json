@@ -1,0 +1,35 @@
+{
+  "total_foods": 1346,
+  "categories": {
+    "STAPLE": 667,
+    "PROTEIN": 321,
+    "VEGETABLE": 157,
+    "FRUIT": 100,
+    "DESSERT": 49,
+    "BEVERAGE": 29,
+    "SNACK": 23
+  },
+  "cuisines": {
+    "INDONESIAN_GENERAL": 1282,
+    "INDONESIAN_PADANG": 27,
+    "INDONESIAN_JAVA": 24,
+    "INDONESIAN_SUNDA": 8,
+    "WESTERN": 3,
+    "ASIAN": 2
+  },
+  "dietary_flags": {
+    "halal": 1327,
+    "vegetarian": 1068,
+    "vegan": 1033,
+    "gluten_free": 1328
+  },
+  "nutrition_avg": {
+    "calories": 195.8,
+    "protein_g": 9.8,
+    "fat_g": 7.0,
+    "carbs_g": 25.0
+  },
+  "price_median_idr": 11500,
+  "avg_name_length": 15.9,
+  "avg_word_count": 2.6
+}

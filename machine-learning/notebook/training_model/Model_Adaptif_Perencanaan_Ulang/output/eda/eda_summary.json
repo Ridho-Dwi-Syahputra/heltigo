@@ -1,0 +1,10 @@
+{
+  "n_rows": 2773,
+  "real_count": 973,
+  "synthetic_count": 1800,
+  "score_mean": 47.46,
+  "score_std": 24.97,
+  "reduce_pct": 56.0,
+  "maintain_pct": 32.0,
+  "intensify_pct": 12.0
+}

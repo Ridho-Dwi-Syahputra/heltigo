@@ -1,0 +1,38 @@
+{
+  "xgboost": {
+    "mae": 0.0258,
+    "rmse": 0.0328,
+    "r2": 0.9649,
+    "best_params": {
+      "lr": 0.08374577922811874,
+      "depth": 6,
+      "n_est": 500,
+      "subsample": 0.9956952030582766,
+      "colsample": 0.6006598057902677,
+      "min_child": 5,
+      "gamma": 0.01845867705411243
+    },
+    "model_size_kb": 5.3
+  },
+  "dt_baseline": {
+    "mae": 0.0263,
+    "r2": 0.9642
+  },
+  "comparison": {
+    "mae_improvement_pct": 1.69
+  },
+  "target_pass": {
+    "mae_lt_0.04": true,
+    "r2_gt_0.90": true
+  },
+  "note": "Rule 3-cabang tetap primary di backend; XGBoost untuk fine-tune multiplier post-rule",
+  "features": [
+    "weekly_score",
+    "weight_diff_kg",
+    "bmi",
+    "experience_level",
+    "age",
+    "workout_frequency"
+  ],
+  "target": "target_multiplier"
+}

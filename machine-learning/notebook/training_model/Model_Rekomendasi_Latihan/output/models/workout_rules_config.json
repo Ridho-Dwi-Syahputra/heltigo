@@ -1,0 +1,141 @@
+{
+  "version": "1.0-rule-engine",
+  "schedule_templates": {
+    "BEGINNER_WEIGHT_LOSS": [
+      "CARDIO",
+      "STRENGTH",
+      "REST",
+      "CARDIO",
+      "FLEXIBILITY",
+      "REST",
+      "REST"
+    ],
+    "BEGINNER_MUSCLE_GAIN": [
+      "STRENGTH",
+      "REST",
+      "STRENGTH",
+      "CARDIO",
+      "REST",
+      "STRENGTH",
+      "REST"
+    ],
+    "BEGINNER_MAINTENANCE": [
+      "CARDIO",
+      "REST",
+      "STRENGTH",
+      "REST",
+      "FLEXIBILITY",
+      "CARDIO",
+      "REST"
+    ],
+    "BEGINNER_PERFORMANCE": [
+      "CARDIO",
+      "STRENGTH",
+      "REST",
+      "HIIT",
+      "REST",
+      "FLEXIBILITY",
+      "REST"
+    ],
+    "INTERMEDIATE_WEIGHT_LOSS": [
+      "HIIT",
+      "STRENGTH",
+      "CARDIO",
+      "REST",
+      "HIIT",
+      "FLEXIBILITY",
+      "REST"
+    ],
+    "INTERMEDIATE_MUSCLE_GAIN": [
+      "STRENGTH",
+      "STRENGTH",
+      "REST",
+      "STRENGTH",
+      "CARDIO",
+      "STRENGTH",
+      "REST"
+    ],
+    "INTERMEDIATE_MAINTENANCE": [
+      "CARDIO",
+      "STRENGTH",
+      "FLEXIBILITY",
+      "REST",
+      "HIIT",
+      "STRENGTH",
+      "REST"
+    ],
+    "INTERMEDIATE_PERFORMANCE": [
+      "HIIT",
+      "STRENGTH",
+      "CARDIO",
+      "REST",
+      "HIIT",
+      "STRENGTH",
+      "REST"
+    ],
+    "ADVANCED_WEIGHT_LOSS": [
+      "HIIT",
+      "STRENGTH",
+      "CARDIO",
+      "HIIT",
+      "STRENGTH",
+      "FLEXIBILITY",
+      "REST"
+    ],
+    "ADVANCED_MUSCLE_GAIN": [
+      "STRENGTH",
+      "STRENGTH",
+      "HIIT",
+      "STRENGTH",
+      "STRENGTH",
+      "CARDIO",
+      "REST"
+    ],
+    "ADVANCED_MAINTENANCE": [
+      "HIIT",
+      "STRENGTH",
+      "CARDIO",
+      "STRENGTH",
+      "HIIT",
+      "FLEXIBILITY",
+      "REST"
+    ],
+    "ADVANCED_PERFORMANCE": [
+      "HIIT",
+      "STRENGTH",
+      "HIIT",
+      "STRENGTH",
+      "CARDIO",
+      "STRENGTH",
+      "REST"
+    ]
+  },
+  "intensity_base": {
+    "BEGINNER": "LOW",
+    "INTERMEDIATE": "MID",
+    "ADVANCED": "HIGH"
+  },
+  "sets_reps_template": {
+    "LOW": {
+      "sets": 2,
+      "reps": 12,
+      "rest_seconds": 60
+    },
+    "MID": {
+      "sets": 3,
+      "reps": 10,
+      "rest_seconds": 75
+    },
+    "HIGH": {
+      "sets": 4,
+      "reps": 8,
+      "rest_seconds": 90
+    }
+  },
+  "override_rules": [
+    "OBESE: HIIT \u2192 CARDIO, HIGH \u2192 MID",
+    "UNDERWEIGHT: excess CARDIO \u2192 STRENGTH",
+    "INJURY/JOINT_PAIN: HIIT \u2192 CARDIO, all \u2192 LOW",
+    "PREGNANT: HIIT/STRENGTH \u2192 FLEXIBILITY, all \u2192 LOW"
+  ]
+}

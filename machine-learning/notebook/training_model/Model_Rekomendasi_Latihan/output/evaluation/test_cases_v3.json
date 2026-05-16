@@ -1,0 +1,77 @@
+{
+  "profiles": [
+    {
+      "name": "Beginner Weight Loss",
+      "fitness_level": "BEGINNER",
+      "goal": "WEIGHT_LOSS",
+      "conditions": [],
+      "day_index": 0,
+      "expected_type": "CARDIO",
+      "expected_intensity": "LOW",
+      "predicted_type": "CARDIO",
+      "predicted_intensity": "LOW",
+      "type_ok": true,
+      "intensity_ok": true,
+      "passed": true
+    },
+    {
+      "name": "Advanced Muscle Gain",
+      "fitness_level": "ADVANCED",
+      "goal": "MUSCLE_GAIN",
+      "conditions": [],
+      "day_index": 0,
+      "expected_type": "STRENGTH",
+      "expected_intensity": "HIGH",
+      "predicted_type": "STRENGTH",
+      "predicted_intensity": "HIGH",
+      "type_ok": true,
+      "intensity_ok": true,
+      "passed": true
+    },
+    {
+      "name": "Intermediate Maintenance",
+      "fitness_level": "INTERMEDIATE",
+      "goal": "MAINTENANCE",
+      "conditions": [],
+      "day_index": 0,
+      "expected_type": "STRENGTH",
+      "expected_intensity": "MID",
+      "predicted_type": "STRENGTH",
+      "predicted_intensity": "MID",
+      "type_ok": true,
+      "intensity_ok": true,
+      "passed": true
+    },
+    {
+      "name": "Beginner with Injury",
+      "fitness_level": "BEGINNER",
+      "goal": "MAINTENANCE",
+      "conditions": [
+        "INJURY"
+      ],
+      "day_index": 0,
+      "expected_type": "FLEXIBILITY",
+      "expected_intensity": "LOW",
+      "predicted_type": "FLEXIBILITY",
+      "predicted_intensity": "LOW",
+      "type_ok": true,
+      "intensity_ok": true,
+      "passed": true
+    },
+    {
+      "name": "Advanced Performance",
+      "fitness_level": "ADVANCED",
+      "goal": "PERFORMANCE",
+      "conditions": [],
+      "day_index": 0,
+      "expected_type": "HIIT",
+      "expected_intensity": "HIGH",
+      "predicted_type": "HIIT",
+      "predicted_intensity": "HIGH",
+      "type_ok": true,
+      "intensity_ok": true,
+      "passed": true
+    }
+  ],
+  "total_profiles_passed": 5
+}

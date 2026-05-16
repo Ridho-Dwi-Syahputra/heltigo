@@ -1,0 +1,57 @@
+{
+  "version": "1.0",
+  "n_scenarios": 5,
+  "avg_match_rate": 0.8667,
+  "target_match_rate": 0.8,
+  "pass": true,
+  "per_scenario": [
+    {
+      "name": "1. Sarapan sehat (Weight Loss)",
+      "match_rate": 1.0,
+      "assessment": "POOR",
+      "total_calories": 716.0,
+      "n_foods_input": 3,
+      "n_foods_matched": 3
+    },
+    {
+      "name": "2. Makan siang binaragawan (Muscle Gain)",
+      "match_rate": 1.0,
+      "assessment": "GOOD",
+      "total_calories": 1022.0,
+      "n_foods_input": 3,
+      "n_foods_matched": 3
+    },
+    {
+      "name": "3. Snack tinggi kalori (Weight Loss)",
+      "match_rate": 1.0,
+      "assessment": "MODERATE",
+      "total_calories": 532.0,
+      "n_foods_input": 2,
+      "n_foods_matched": 2
+    },
+    {
+      "name": "4. Makan penderita diabetes",
+      "match_rate": 1.0,
+      "assessment": "GOOD",
+      "total_calories": 391.0,
+      "n_foods_input": 2,
+      "n_foods_matched": 2
+    },
+    {
+      "name": "5. OOD: makanan asing",
+      "match_rate": 0.3333,
+      "assessment": "GOOD",
+      "total_calories": 216.0,
+      "n_foods_input": 3,
+      "n_foods_matched": 2
+    }
+  ],
+  "artifacts": {
+    "vectorizer": "output/models/food_tfidf_vectorizer.pkl",
+    "food_matrix": "output/models/food_name_matrix.npy",
+    "scorer": "output/models/nutrition_scorer.pkl",
+    "scanner_config": "output/models/scanner_config.json",
+    "alias_map": "output/preprocessed/alias_map.json",
+    "food_db": "output/preprocessed/food_processed.parquet"
+  }
+}

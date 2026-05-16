@@ -1,0 +1,54 @@
+{
+  "version": "3.0-dynamic-budget",
+  "min_budget_idr": 10000,
+  "goal_weights": {
+    "WEIGHT_LOSS": {
+      "protein": 0.4,
+      "fiber": 0.3,
+      "fat_penalty": 0.2,
+      "cal_bonus": 0.1
+    },
+    "MUSCLE_GAIN": {
+      "protein": 0.5,
+      "fiber": 0.1,
+      "fat_penalty": 0.1,
+      "cal_bonus": 0.3
+    },
+    "MAINTENANCE": {
+      "protein": 0.35,
+      "fiber": 0.2,
+      "fat_penalty": 0.2,
+      "cal_bonus": 0.25
+    },
+    "PERFORMANCE": {
+      "protein": 0.4,
+      "fiber": 0.1,
+      "fat_penalty": 0.15,
+      "cal_bonus": 0.35
+    }
+  },
+  "meal_splits": {
+    "2": {
+      "BREAKFAST": 0.4,
+      "DINNER": 0.6
+    },
+    "3": {
+      "BREAKFAST": 0.28,
+      "LUNCH": 0.4,
+      "DINNER": 0.32
+    },
+    "4": {
+      "BREAKFAST": 0.22,
+      "LUNCH": 0.35,
+      "SNACK": 0.1,
+      "DINNER": 0.33
+    }
+  },
+  "budget_tiers": {
+    "LOW": "<20K",
+    "MID": "20-50K",
+    "HIGH": ">50K"
+  },
+  "low_budget_relaxation": "20% budget overshoot allowed",
+  "calorie_tolerance": 0.15
+}

@@ -1,0 +1,14 @@
+{
+  "REDUCE": {
+    "alpha": 3.0,
+    "beta": 4.0
+  },
+  "MAINTAIN_SWAP": {
+    "alpha": 54.0,
+    "beta": 20.0
+  },
+  "INTENSIFY": {
+    "alpha": 14.0,
+    "beta": 11.0
+  }
+}

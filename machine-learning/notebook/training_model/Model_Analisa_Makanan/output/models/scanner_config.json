@@ -1,0 +1,64 @@
+{
+  "version": "1.0",
+  "features": [
+    "total_cal",
+    "total_protein",
+    "total_fat",
+    "total_carbs",
+    "n_foods",
+    "goal_enc",
+    "condition_enc"
+  ],
+  "label_map": {
+    "0": "POOR",
+    "1": "MODERATE",
+    "2": "GOOD"
+  },
+  "goal_map": {
+    "0": "WEIGHT_LOSS",
+    "1": "MUSCLE_GAIN",
+    "2": "MAINTENANCE",
+    "3": "PERFORMANCE"
+  },
+  "condition_map": {
+    "None": 0,
+    "Diabetes": 1,
+    "Hypertension": 2,
+    "Obesity": 3
+  },
+  "goal_rules": {
+    "WEIGHT_LOSS": {
+      "cal_max_per_meal": 500,
+      "protein_min_per_meal": 25,
+      "fat_max_per_meal": 15,
+      "carbs_max_per_meal": 65
+    },
+    "MUSCLE_GAIN": {
+      "cal_min_per_meal": 400,
+      "protein_min_per_meal": 35,
+      "fat_max_per_meal": 20,
+      "carbs_min_per_meal": 55
+    },
+    "MAINTENANCE": {
+      "cal_max_per_meal": 600,
+      "protein_min_per_meal": 20,
+      "fat_max_per_meal": 20,
+      "carbs_max_per_meal": 80
+    },
+    "PERFORMANCE": {
+      "cal_min_per_meal": 450,
+      "protein_min_per_meal": 30,
+      "fat_max_per_meal": 18,
+      "carbs_min_per_meal": 60
+    }
+  },
+  "f1_macro": 0.9567,
+  "best_params": {
+    "lr": 0.13744699059132842,
+    "depth": 6,
+    "n_est": 150,
+    "sub": 0.7960159126528711,
+    "col": 0.9428736755059343
+  },
+  "n_training": 5000
+}

@@ -1,0 +1,29 @@
+{
+  "dataset_sources": {
+    "real": 973,
+    "synthetic": 1800,
+    "combined": 2773
+  },
+  "missing_values": 491,
+  "workout_type_distribution": {
+    "Strength": 722,
+    "Cardio": 683,
+    "Yoga": 664,
+    "HIIT": 610,
+    "\\nStrength": 12,
+    "\\tCardio": 11,
+    "\\tYoga": 10
+  },
+  "intensity_distribution": {
+    "2.0": 1124,
+    "1.0": 1042,
+    "3.0": 550
+  },
+  "class_imbalance_ratio": 72.2,
+  "needs_smoteenn": true,
+  "recommended_scaler": "RobustScaler",
+  "bmi_range": "12.32 \u2013 49.84",
+  "age_range": "18 \u2013 59",
+  "datasets_will_combine": true,
+  "augmentation_target_rows": 19411
+}

@@ -1,0 +1,80 @@
+{
+  "version": "v3-knowledge-distillation",
+  "n_profiles": 20000,
+  "n_training_rows": 140000,
+  "workout_type": {
+    "accuracy": 1.0,
+    "f1_macro": 1.0,
+    "classes": [
+      "CARDIO",
+      "FLEXIBILITY",
+      "HIIT",
+      "STRENGTH"
+    ],
+    "best_params": {
+      "learning_rate": 0.1,
+      "max_depth": 15,
+      "n_estimators": 300,
+      "subsample": 1.0,
+      "colsample_bytree": 1.0,
+      "min_child_weight": 1,
+      "random_state": 42,
+      "eval_metric": "mlogloss",
+      "verbosity": 0
+    }
+  },
+  "intensity": {
+    "accuracy": 1.0,
+    "f1_macro": 1.0,
+    "classes": [
+      "HIGH",
+      "LOW",
+      "MID"
+    ],
+    "best_params": {
+      "learning_rate": 0.1,
+      "max_depth": 15,
+      "n_estimators": 300,
+      "subsample": 1.0,
+      "colsample_bytree": 1.0,
+      "min_child_weight": 1,
+      "random_state": 42,
+      "eval_metric": "mlogloss",
+      "verbosity": 0
+    }
+  },
+  "improvement_vs_v2": {
+    "v2_f1_workout": 0.2306,
+    "v3_f1_workout": 1.0,
+    "v2_f1_intensity": 0.5234,
+    "v3_f1_intensity": 1.0
+  },
+  "features_used": [
+    "BMI",
+    "bmi_cat",
+    "gender_enc",
+    "Age",
+    "age_band",
+    "fitness_level",
+    "goal",
+    "mode",
+    "days_per_week",
+    "session_minutes",
+    "day_index",
+    "has_injury",
+    "has_chronic",
+    "bmr",
+    "tdee",
+    "ffmi",
+    "bmi_x_age",
+    "activity_x_duration",
+    "bpm_intensity_ratio",
+    "calorie_efficiency",
+    "avg_bpm",
+    "max_bpm",
+    "resting_bpm",
+    "calories_burned",
+    "fat_pct",
+    "water_intake"
+  ]
+}

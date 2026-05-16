@@ -1,0 +1,41 @@
+{
+  "n_foods": 1346,
+  "zero_calorie_count": 1,
+  "calorie_range": "0.0 \u2013 940.0",
+  "avg_calories": 203.2,
+  "category_dist": {
+    "STAPLE": 666,
+    "PROTEIN": 319,
+    "VEGETABLE": 158,
+    "FRUIT": 100,
+    "DESSERT": 49,
+    "BEVERAGE": 29,
+    "SNACK": 25
+  },
+  "cuisine_dist": {
+    "GENERAL_INDO": 1282,
+    "PADANG": 27,
+    "JAVA": 24,
+    "SUNDA": 8,
+    "WESTERN": 3,
+    "ASIAN": 2
+  },
+  "price_summary_per_category": {
+    "BEVERAGE": 7052.0,
+    "DESSERT": 16316.0,
+    "FRUIT": 8670.0,
+    "PROTEIN": 25745.0,
+    "SNACK": 9040.0,
+    "STAPLE": 11634.0,
+    "VEGETABLE": 6791.0
+  },
+  "augmentation_columns_required": [
+    "category",
+    "estimated_price_idr",
+    "is_halal",
+    "is_vegetarian",
+    "is_vegan",
+    "is_gluten_free",
+    "cuisine"
+  ]
+}

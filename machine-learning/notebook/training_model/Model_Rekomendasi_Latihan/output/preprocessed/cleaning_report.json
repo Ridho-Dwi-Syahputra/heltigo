@@ -1,0 +1,30 @@
+{
+  "input_file": "D:\\Local Disk D\\Tugas\\hackathon core3d\\machine-learning\\notebook\\dataset\\Model_rekomendasi_Pelatihan\\gym_member_exercise_dataset\\gym_members_exercise_tracking.csv",
+  "original_rows": 973,
+  "dirty_labels_fixed": 0,
+  "outliers_dropped": 0,
+  "final_rows": 973,
+  "workout_type_dist": {
+    "Strength": 258,
+    "Cardio": 255,
+    "Yoga": 239,
+    "HIIT": 221
+  },
+  "columns": [
+    "Age",
+    "Gender",
+    "Weight (kg)",
+    "Height (m)",
+    "Max_BPM",
+    "Avg_BPM",
+    "Resting_BPM",
+    "Session_Duration (hours)",
+    "Calories_Burned",
+    "Workout_Type",
+    "Fat_Percentage",
+    "Water_Intake (liters)",
+    "Workout_Frequency (days/week)",
+    "Experience_Level",
+    "BMI"
+  ]
+}

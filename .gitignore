@@ -116,21 +116,21 @@ nosetests.xml
 coverage.xml
 *.cover
 
-# ─── Dataset > 100MB (GitHub limit) ──────────────────────────
-# programs_detailed_boostcamp_kaggle.csv is 282MB — download from
-# Kaggle: https://www.kaggle.com/datasets/...
+# ─── Dataset (tidak perlu di-push — besar, download manual) ─────────────
 notebook/dataset/Model_rekomendasi_Pelatihan/600K+ Fitness Exercise & Workout Program Dataset/programs_detailed_boostcamp_kaggle.csv
+machine-learning/notebook/dataset/
 
-# ─── ML Output Artifacts (regenerable from notebooks) ────────
-# Keep small outputs (json/png) for showcase, exclude large pkl/parquet
+# ─── File model > 50MB (GitHub hard limit 100MB, warning >50MB) ─────────
+# food_name_matrix.npy = 52MB (regenerable via 02_food_matcher.ipynb)
+machine-learning/notebook/training_model/Model_Analisa_Makanan/output/models/food_name_matrix.npy
+
+# ─── ML Output Artifacts lama (path lama sebelum restructure) ────────────
 notebook/training_model/*/output/models/*.pkl
 notebook/training_model/*/output/preprocessed/*.parquet
 notebook/training_model/*/output/preprocessed/*.csv
 notebook/training_model/*/output/eda/*.csv
 
-# Optuna study (can be large)
-*.db
-optuna_study*.pkl
+
 
 # ─── Distribution / packaging ────────────────────────────────
 build/

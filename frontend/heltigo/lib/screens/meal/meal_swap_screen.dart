@@ -218,9 +218,7 @@ class _MealSwapScreenState extends State<MealSwapScreen> {
     final alternatives = _filteredAlternatives;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -367,7 +365,7 @@ class _MealSwapScreenState extends State<MealSwapScreen> {
                 AppDimensions.base,
                 AppDimensions.base + MediaQuery.of(context).padding.bottom,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.background,
                 border: Border(
                   top: BorderSide(color: AppColors.divider, width: 1),
@@ -744,7 +742,7 @@ class _EmptyAlternatives extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(
+          Icon(
             Icons.search_off,
             size: 48,
             color: AppColors.textTertiary,

@@ -68,10 +68,10 @@ class _SetupBasicInfoScreenState extends State<SetupBasicInfoScreen> {
             colorScheme: const ColorScheme.dark(
               primary: AppColors.primary,
               onPrimary: AppColors.textOnPrimary,
-              surface: AppColors.surface,
-              onSurface: AppColors.textPrimary,
+              surface: const Color(0xFF1A1A1A),
+              onSurface: const Color(0xFFF5F5F5),
             ),
-            dialogTheme: const DialogThemeData(
+            dialogTheme: DialogThemeData(
               backgroundColor: AppColors.surface,
             ),
           ),
@@ -117,7 +117,7 @@ class _SetupBasicInfoScreenState extends State<SetupBasicInfoScreen> {
               color: AppColors.textPrimary,
             ),
             cursorColor: AppColors.primary,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: 'mis. Andra',
               prefixIcon: Icon(
                 Icons.person_outline,
@@ -221,7 +221,7 @@ class _DobPickerTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.cake_outlined,
               color: AppColors.textTertiary,
               size: 20,
@@ -237,7 +237,7 @@ class _DobPickerTile extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(
+            Icon(
               Icons.calendar_today_outlined,
               color: AppColors.textTertiary,
               size: 18,

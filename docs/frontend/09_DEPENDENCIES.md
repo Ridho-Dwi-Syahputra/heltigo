@@ -1,5 +1,11 @@
 # Frontend — Dependencies (pubspec.yaml)
 
+> ⚠️ **Update 2026-05-16:** Dependency baru ditambahkan untuk fitur Food Scan:
+> - `image_picker: ^1.1.2` — kamera + galeri untuk scan makanan
+> - `permission_handler: ^11.3.1` — request camera/storage permissions
+>
+> Stack aktual berbeda dari draft di bawah (pakai `provider` + `get_it`, bukan Riverpod; pakai `shared_preferences`, bukan Hive). Lihat `pubspec.yaml` untuk versi aktual.
+
 Versi yang dianjurkan per 2026-05-07. Boleh upgrade jika ada release stabil terbaru selama tidak breaking.
 
 ## 1. Full pubspec.yaml

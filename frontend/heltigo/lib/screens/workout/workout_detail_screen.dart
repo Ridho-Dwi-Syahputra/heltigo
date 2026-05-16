@@ -108,7 +108,6 @@ class WorkoutDetailScreen extends StatelessWidget {
     final cooldown = _byPhase(_Phase.cooldown);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -139,11 +138,11 @@ class WorkoutDetailScreen extends StatelessWidget {
                   Container(
                     width: 40,
                     height: 40,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: AppColors.surfaceLight,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.person_outline,
                       color: AppColors.textSecondary,
                       size: 20,
@@ -332,7 +331,7 @@ class WorkoutDetailScreen extends StatelessWidget {
                 AppDimensions.base,
                 AppDimensions.base + MediaQuery.of(context).padding.bottom,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.background,
                 border: Border(
                   top: BorderSide(color: AppColors.divider, width: 1),

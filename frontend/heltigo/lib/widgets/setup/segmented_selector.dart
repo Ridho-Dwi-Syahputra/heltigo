@@ -99,14 +99,18 @@ class _Pill extends StatelessWidget {
             width: 1,
           ),
         ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: AppTextStyles.body.copyWith(
-            color: isSelected
-                ? AppColors.textOnPrimary
-                : AppColors.textSecondary,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            style: AppTextStyles.body.copyWith(
+              color: isSelected
+                  ? AppColors.textOnPrimary
+                  : AppColors.textSecondary,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            ),
           ),
         ),
       ),

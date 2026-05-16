@@ -90,9 +90,7 @@ class _FoodItemDetailScreenState extends State<FoodItemDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(

@@ -41,7 +41,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final logoWidth = (screenWidth * 0.3).clamp(100.0, 140.0);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -134,7 +133,7 @@ class _FormView extends StatelessWidget {
               color: AppColors.textPrimary,
             ),
             cursorColor: AppColors.primary,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: 'Email',
               prefixIcon: Icon(
                 Icons.email_outlined,

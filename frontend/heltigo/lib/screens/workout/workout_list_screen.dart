@@ -138,7 +138,6 @@ class WorkoutListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -248,7 +247,7 @@ class WorkoutListScreen extends StatelessWidget {
                 AppDimensions.base,
                 AppDimensions.base + MediaQuery.of(context).padding.bottom,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.background,
                 border: Border(
                   top: BorderSide(color: AppColors.divider, width: 1),

@@ -52,7 +52,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final logoWidth = (screenWidth * 0.35).clamp(120.0, 160.0);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       // Custom AppBar — back button transparan
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -118,7 +117,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     color: AppColors.textPrimary,
                   ),
                   cursorColor: AppColors.primary,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Nama Lengkap',
                     prefixIcon: Icon(
                       Icons.person_outlined,
@@ -149,7 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     color: AppColors.textPrimary,
                   ),
                   cursorColor: AppColors.primary,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Email',
                     prefixIcon: Icon(
                       Icons.email_outlined,
@@ -182,7 +181,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   cursorColor: AppColors.primary,
                   decoration: InputDecoration(
                     hintText: 'Password',
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.lock_outlined,
                       color: AppColors.textTertiary,
                       size: 20,
@@ -225,7 +224,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   cursorColor: AppColors.primary,
                   decoration: InputDecoration(
                     hintText: 'Konfirmasi Password',
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.lock_outlined,
                       color: AppColors.textTertiary,
                       size: 20,

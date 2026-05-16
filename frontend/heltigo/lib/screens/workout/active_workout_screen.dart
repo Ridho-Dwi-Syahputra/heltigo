@@ -160,7 +160,6 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
     final progress = (_currentExerciseIndex + 1) / _steps.length;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [

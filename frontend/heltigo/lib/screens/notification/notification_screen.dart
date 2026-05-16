@@ -55,8 +55,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
             colorScheme: const ColorScheme.dark(
               primary: AppColors.primary,
               onPrimary: AppColors.textOnPrimary,
-              surface: AppColors.surface,
-              onSurface: AppColors.textPrimary,
+              surface: const Color(0xFF1A1A1A),
+              onSurface: const Color(0xFFF5F5F5),
             ),
           ),
           child: child!,
@@ -91,9 +91,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(

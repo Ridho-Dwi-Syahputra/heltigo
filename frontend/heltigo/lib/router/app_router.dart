@@ -31,6 +31,7 @@ import 'package:heltigo/screens/meal/meal_swap_screen.dart';
 import 'package:heltigo/screens/meal/meal_log_screen.dart';
 import 'package:heltigo/screens/meal/food_item_detail_screen.dart';
 import 'package:heltigo/screens/meal/budget_settings_screen.dart';
+import 'package:heltigo/screens/meal/food_scan_screen.dart';
 import 'package:heltigo/screens/progress/weekly_review_screen.dart';
 import 'package:heltigo/screens/progress/badge_gallery_screen.dart';
 import 'package:heltigo/screens/progress/streak_detail_screen.dart';
@@ -224,6 +225,10 @@ class AppRouter {
       GoRoute(
         path: '/meal/budget-settings',
         builder: (context, state) => const BudgetSettingsScreen(),
+      ),
+      GoRoute(
+        path: '/meal/food-scan',
+        builder: (context, state) => const FoodScanScreen(),
       ),
       GoRoute(
         path: '/meal/log/:mealId',

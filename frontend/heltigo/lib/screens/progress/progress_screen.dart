@@ -94,7 +94,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
             .toDouble();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         bottom: false,
         child: ListView(

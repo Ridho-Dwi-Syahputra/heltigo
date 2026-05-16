@@ -104,7 +104,6 @@ class _SplashScreenState extends State<SplashScreen>
     final logoWidth = (screenWidth * 0.45).clamp(140.0, 220.0);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SizedBox(
         width: double.infinity,
         height: double.infinity,

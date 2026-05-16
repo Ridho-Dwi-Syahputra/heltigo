@@ -2,8 +2,25 @@
 
 **Tanggal terakhir update:** 16 Mei 2026
 **Status:** 🚀 Dalam Pengembangan Aktif
-**Tema Aktif:** Dark Mode (Teal #1D6766 & Orange #FB3A01)
+**Tema Aktif:** Dark / Light / System (user-configurable)
 
+> 📌 **Sprint update 2026-05-16 (Light Mode + Food Scan):**
+> - ✅ **Light/Dark/System Theme** — user bisa pilih tema di Settings (disimpan ke SharedPreferences)
+>   - `ThemeProvider` (ChangeNotifier) + `ThemeMode` dari `MaterialApp`
+>   - `AppTheme.lightTheme` ditambahkan dengan warna sesuai design system
+>   - Settings screen: toggle 3-way (Sistem / Terang / Gelap) menggantikan locked switch
+> - ✅ **Food Scan Screen** (`/meal/food-scan`) — baru:
+>   - `image_picker` untuk kamera + galeri
+>   - Tampilan hasil: nama makanan terdeteksi, kalori, protein, lemak, karbo
+>   - Assessment badge: GOOD / MODERATE / POOR
+>   - Terhubung dari card "Scan Makanan" di Rencana Makanku
+>   - TODO: Integrasikan ke FastAPI `/predict/food-scan` dengan Gemini Vision
+> - ✅ **Multi-select labels** di screen kondisi khusus & pantangan diet
+> - ✅ **Button text responsive** (`FittedBox` di SegmentedSelector + Konfirmasi button)
+> - ✅ **Ubah Manual modal** — bottom sheet dengan input berat badan
+> - 📦 Dependency baru: `image_picker: ^1.1.2`, `permission_handler: ^11.3.1`
+> - `flutter analyze lib/` → **No issues found**
+>
 > 📌 **Sprint update 2026-05-16 (ML Fix):**
 > - ✅ **Workout Recommender**: Switched dari XGBoost (F1=0.23, gagal) ke **Rule-Based Engine** — 5/5 test cases PASSED
 > - ✅ **Meal Planner**: Calorie deviation diperbaiki dari **48.7% → 4.9%** (target ≤15% — MET!)

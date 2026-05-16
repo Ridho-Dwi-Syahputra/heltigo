@@ -153,7 +153,7 @@ class _SetupFitnessLevelScreenState extends State<SetupFitnessLevelScreen> {
             padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xs),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.info_outline,
                   size: 14,
                   color: AppColors.textTertiary,

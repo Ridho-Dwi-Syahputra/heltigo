@@ -50,9 +50,7 @@ class ReplanningReadyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         automaticallyImplyLeading: false,
@@ -75,7 +73,7 @@ class ReplanningReadyScreen extends StatelessWidget {
               child: ClipRRect(
                 borderRadius:
                     BorderRadius.circular(AppDimensions.radiusFull),
-                child: const LinearProgressIndicator(
+                child: LinearProgressIndicator(
                   value: 1,
                   minHeight: 4,
                   backgroundColor: AppColors.surfaceLight,
@@ -359,7 +357,7 @@ class ReplanningReadyScreen extends StatelessWidget {
                 AppDimensions.base +
                     MediaQuery.of(context).padding.bottom,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.background,
                 border: Border(
                   top: BorderSide(color: AppColors.divider, width: 1),

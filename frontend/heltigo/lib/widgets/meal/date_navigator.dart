@@ -60,7 +60,7 @@ class DateNavigator extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.calendar_today_outlined,
                     size: 14,
                     color: AppColors.textSecondary,

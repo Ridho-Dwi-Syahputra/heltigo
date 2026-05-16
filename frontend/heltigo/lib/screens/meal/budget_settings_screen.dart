@@ -119,9 +119,7 @@ class _BudgetSettingsScreenState extends State<BudgetSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -349,7 +347,7 @@ class _BudgetSettingsScreenState extends State<BudgetSettingsScreen> {
                 AppDimensions.base,
                 AppDimensions.base + MediaQuery.of(context).padding.bottom,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.background,
                 border: Border(
                   top: BorderSide(color: AppColors.divider, width: 1),
@@ -366,7 +364,7 @@ class _BudgetSettingsScreenState extends State<BudgetSettingsScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.auto_awesome,
                         size: 12,
                         color: AppColors.textTertiary,

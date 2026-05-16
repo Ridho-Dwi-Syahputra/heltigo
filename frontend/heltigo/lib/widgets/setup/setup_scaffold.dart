@@ -50,7 +50,6 @@ class SetupScaffold extends StatelessWidget {
     final progress = currentStep / totalSteps;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       // AppBar transparan dengan back button
       appBar: AppBar(
         backgroundColor: Colors.transparent,

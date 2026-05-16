@@ -84,7 +84,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             AppDimensions.xxl + bottomSafe;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: Stack(
         children: [
           // ═══════════════════════════════════════

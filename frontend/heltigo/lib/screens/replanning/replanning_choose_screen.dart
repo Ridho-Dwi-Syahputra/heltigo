@@ -24,9 +24,7 @@ class _ReplanningChooseScreenState extends State<ReplanningChooseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -55,7 +53,7 @@ class _ReplanningChooseScreenState extends State<ReplanningChooseScreen> {
               child: ClipRRect(
                 borderRadius:
                     BorderRadius.circular(AppDimensions.radiusFull),
-                child: const LinearProgressIndicator(
+                child: LinearProgressIndicator(
                   value: 0.66,
                   minHeight: 4,
                   backgroundColor: AppColors.surfaceLight,
@@ -143,7 +141,7 @@ class _ReplanningChooseScreenState extends State<ReplanningChooseScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.info_outline,
                           size: 16,
                           color: AppColors.textTertiary,
@@ -173,7 +171,7 @@ class _ReplanningChooseScreenState extends State<ReplanningChooseScreen> {
                 AppDimensions.base +
                     MediaQuery.of(context).padding.bottom,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.background,
                 border: Border(
                   top: BorderSide(color: AppColors.divider, width: 1),

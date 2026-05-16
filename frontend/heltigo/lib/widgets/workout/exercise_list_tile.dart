@@ -153,7 +153,7 @@ class ExerciseListTile extends StatelessWidget {
             ),
             const SizedBox(width: AppDimensions.sm),
 
-            const Icon(
+            Icon(
               Icons.chevron_right,
               color: AppColors.textTertiary,
               size: 20,

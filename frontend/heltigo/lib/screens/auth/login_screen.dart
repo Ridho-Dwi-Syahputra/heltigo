@@ -39,7 +39,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final logoWidth = (screenWidth * 0.35).clamp(120.0, 160.0);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(
@@ -87,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: AppColors.textPrimary,
                   ),
                   cursorColor: AppColors.primary,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Email',
                     prefixIcon: Icon(
                       Icons.email_outlined,
@@ -119,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   cursorColor: AppColors.primary,
                   decoration: InputDecoration(
                     hintText: 'Password',
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.lock_outlined,
                       color: AppColors.textTertiary,
                       size: 20,

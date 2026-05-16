@@ -167,9 +167,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -225,7 +223,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: AppColors.textPrimary,
                       ),
                       cursorColor: AppColors.primary,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         prefixIcon: Icon(
                           Icons.person_outline,
                           color: AppColors.textTertiary,
@@ -244,7 +242,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: AppColors.textPrimary,
                       ),
                       cursorColor: AppColors.primary,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         prefixIcon: Icon(
                           Icons.cake_outlined,
                           color: AppColors.textTertiary,
@@ -301,7 +299,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: AppColors.textPrimary,
                       ),
                       cursorColor: AppColors.primary,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         prefixIcon: Icon(
                           Icons.height,
                           color: AppColors.textTertiary,
@@ -325,7 +323,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: AppColors.textPrimary,
                       ),
                       cursorColor: AppColors.primary,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         prefixIcon: Icon(
                           Icons.monitor_weight_outlined,
                           color: AppColors.textTertiary,
@@ -347,7 +345,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: AppColors.textPrimary,
                       ),
                       cursorColor: AppColors.primary,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         prefixIcon: Icon(
                           Icons.straighten,
                           color: AppColors.textTertiary,
@@ -421,7 +419,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 ],
                               ),
                             ),
-                            const Icon(
+                            Icon(
                               Icons.chevron_right,
                               color: AppColors.textTertiary,
                               size: 20,

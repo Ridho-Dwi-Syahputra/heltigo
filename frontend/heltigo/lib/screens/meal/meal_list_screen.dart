@@ -124,8 +124,8 @@ class _MealListScreenState extends State<MealListScreen> {
             colorScheme: const ColorScheme.dark(
               primary: AppColors.primary,
               onPrimary: AppColors.textOnPrimary,
-              surface: AppColors.surface,
-              onSurface: AppColors.textPrimary,
+              surface: const Color(0xFF1A1A1A),
+              onSurface: const Color(0xFFF5F5F5),
             ),
           ),
           child: child!,
@@ -182,7 +182,6 @@ class _MealListScreenState extends State<MealListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         bottom: false,
         child: RefreshIndicator(
@@ -267,7 +266,15 @@ class _MealListScreenState extends State<MealListScreen> {
               const SizedBox(height: AppDimensions.sm),
 
               // ═══════════════════════════════════════
-              // 6. MEAL SECTIONS
+              // 6. SCAN MAKANAN CARD
+              // ═══════════════════════════════════════
+              _FoodScanCard(
+                onScanPressed: () => context.push('/meal/food-scan'),
+              ),
+              const SizedBox(height: AppDimensions.sm + 2),
+
+              // ═══════════════════════════════════════
+              // 7. MEAL SECTIONS
               // ═══════════════════════════════════════
               MealSectionCard(
                 mealType: 'Sarapan',
@@ -397,6 +404,81 @@ class _MealListScreenState extends State<MealListScreen> {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FOOD SCAN CARD
+// ═══════════════════════════════════════════════════════════════
+
+class _FoodScanCard extends StatelessWidget {
+  final VoidCallback onScanPressed;
+
+  const _FoodScanCard({required this.onScanPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onScanPressed,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+          child: Padding(
+            padding: const EdgeInsets.all(AppDimensions.base),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryMuted,
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.radiusCard),
+                  ),
+                  child: const Icon(
+                    Icons.camera_alt_outlined,
+                    color: AppColors.primary,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: AppDimensions.base),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Scan Makanan',
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Foto makananmu, AI analisis kalori otomatis',
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right,
+                  color: AppColors.textTertiary,
+                  size: 20,
+                ),
+              ],
+            ),
           ),
         ),
       ),

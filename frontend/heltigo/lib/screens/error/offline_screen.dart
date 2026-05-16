@@ -15,7 +15,7 @@ class OfflineScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.wifi_off,
+              Icon(Icons.wifi_off,
                   size: 64, color: AppColors.textTertiary),
               const SizedBox(height: 16),
               Text('Tidak Ada Koneksi',

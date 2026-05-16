@@ -113,9 +113,7 @@ class WorkoutSessionDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -396,7 +394,7 @@ class WorkoutSessionDetailScreen extends StatelessWidget {
                 AppDimensions.base +
                     MediaQuery.of(context).padding.bottom,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.background,
                 border: Border(
                   top: BorderSide(color: AppColors.divider, width: 1),
@@ -605,7 +603,7 @@ class _ExerciseRow extends StatelessWidget {
       decoration: BoxDecoration(
         border: isLast
             ? null
-            : const Border(
+            : Border(
                 bottom: BorderSide(color: AppColors.divider, width: 1),
               ),
       ),

@@ -332,7 +332,7 @@ class _BmiScale extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const Icon(
+                        Icon(
                           Icons.arrow_drop_down,
                           color: AppColors.textPrimary,
                           size: 18,

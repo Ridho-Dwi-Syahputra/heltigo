@@ -88,8 +88,8 @@ class _AddWeightSheetContentState extends State<_AddWeightSheetContent> {
             colorScheme: const ColorScheme.dark(
               primary: AppColors.primary,
               onPrimary: AppColors.textOnPrimary,
-              surface: AppColors.surface,
-              onSurface: AppColors.textPrimary,
+              surface: const Color(0xFF1A1A1A),
+              onSurface: const Color(0xFFF5F5F5),
             ),
           ),
           child: child!,
@@ -166,7 +166,7 @@ class _AddWeightSheetContentState extends State<_AddWeightSheetContent> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.calendar_today_outlined,
                           color: AppColors.textTertiary,
                           size: 18,
@@ -182,7 +182,7 @@ class _AddWeightSheetContentState extends State<_AddWeightSheetContent> {
                             ),
                           ),
                         ),
-                        const Icon(
+                        Icon(
                           Icons.chevron_right,
                           color: AppColors.textTertiary,
                           size: 18,
@@ -291,7 +291,7 @@ class _AddWeightSheetContentState extends State<_AddWeightSheetContent> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.history,
                             size: 12,
                             color: AppColors.textTertiary,
@@ -353,7 +353,7 @@ class _AddWeightSheetContentState extends State<_AddWeightSheetContent> {
                     color: AppColors.textPrimary,
                   ),
                   cursorColor: AppColors.primary,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'mis. setelah bangun tidur',
                     prefixIcon: Icon(
                       Icons.edit_note_outlined,

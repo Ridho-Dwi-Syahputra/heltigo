@@ -183,7 +183,42 @@ class _SetupPreferencesScreenState extends State<SetupPreferencesScreen> {
           // ═══════════════════════════════════════
           // PANTANGAN DIET (multi-select)
           // ═══════════════════════════════════════
-          _sectionLabel('Pantangan Diet'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(child: _sectionLabel('Pantangan Diet')),
+              const SizedBox(width: AppDimensions.sm),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.sm,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryMuted,
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.radiusFull),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.check_circle_outline,
+                      size: 12,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Boleh lebih dari satu',
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: AppDimensions.sm),
           ChipMultiSelect(
             options: _dietOptions,

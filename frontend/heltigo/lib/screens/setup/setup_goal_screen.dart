@@ -109,7 +109,7 @@ class _SetupGoalScreenState extends State<SetupGoalScreen> {
                 color: AppColors.textPrimary,
               ),
               cursorColor: AppColors.primary,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: '68',
                 prefixIcon: Icon(
                   Icons.fitness_center_outlined,

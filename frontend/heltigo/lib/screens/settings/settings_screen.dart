@@ -7,7 +7,9 @@
 /// - TENTANG: Heltigo version
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../styles/styles.dart';
+import '../../providers/theme_provider.dart';
 
 enum _Unit { metric, imperial }
 
@@ -21,8 +23,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  // Dark mode locked ON karena app dark-only
-  final bool _darkMode = true;
   _Unit _unit = _Unit.metric;
   _Language _language = _Language.id;
 
@@ -155,9 +155,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -186,16 +184,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: AppDimensions.sm),
             _SettingsGroup(
               children: [
-                _SettingsItem(
-                  icon: Icons.dark_mode_outlined,
-                  title: 'Mode Gelap',
-                  subtitle: 'Saat ini hanya tersedia dark mode',
-                  trailing: Switch(
-                    value: _darkMode,
-                    onChanged: null, // Locked ON
-                    activeThumbColor: AppColors.primary,
-                  ),
-                ),
+                _ThemeModeItem(),
                 _SettingsItem(
                   icon: Icons.straighten,
                   title: 'Satuan',
@@ -224,7 +213,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   icon: Icons.file_download_outlined,
                   title: 'Ekspor Data CSV',
                   subtitle: 'Unduh log latihan, makan, & berat',
-                  trailing: const Icon(
+                  trailing: Icon(
                     Icons.chevron_right,
                     color: AppColors.textTertiary,
                     size: 20,
@@ -261,7 +250,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   icon: Icons.info_outline,
                   title: 'Heltigo v1.0.0',
                   subtitle: 'Aplikasi Kesehatan & Kebugaran Personal',
-                  trailing: const Icon(
+                  trailing: Icon(
                     Icons.chevron_right,
                     color: AppColors.textTertiary,
                     size: 20,
@@ -284,6 +273,110 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: AppDimensions.lg),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// THEME MODE ITEM — 3-way toggle: Sistem / Terang / Gelap
+// ═══════════════════════════════════════════════════════════════
+
+class _ThemeModeItem extends StatelessWidget {
+  const _ThemeModeItem();
+
+  static const _options = [
+    (mode: ThemeMode.system, icon: Icons.brightness_auto_outlined, label: 'Sistem'),
+    (mode: ThemeMode.light,  icon: Icons.light_mode_outlined,      label: 'Terang'),
+    (mode: ThemeMode.dark,   icon: Icons.dark_mode_outlined,       label: 'Gelap'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<ThemeProvider>();
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.base,
+        vertical: AppDimensions.md,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.palette_outlined,
+                size: AppDimensions.iconMedium,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: AppDimensions.md),
+              Expanded(
+                child: Text('Tema Tampilan', style: AppTextStyles.body),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.md),
+          Row(
+            children: _options.map((opt) {
+              final isSelected = provider.mode == opt.mode;
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    right: opt.mode == ThemeMode.dark ? 0 : AppDimensions.sm,
+                  ),
+                  child: GestureDetector(
+                    onTap: () => provider.setMode(opt.mode),
+                    child: AnimatedContainer(
+                      duration: AppDurations.fast,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppDimensions.sm + 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.primaryMuted
+                            : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.radiusCard),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.primary
+                              : Theme.of(context).colorScheme.outline,
+                          width: isSelected ? 1.5 : 1,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            opt.icon,
+                            size: 20,
+                            color: isSelected
+                                ? AppColors.primary
+                                : AppColors.textTertiary,
+                          ),
+                          const SizedBox(height: 4),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              opt.label,
+                              style: AppTextStyles.caption.copyWith(
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : AppColors.textTertiary,
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
       ),
     );
   }
@@ -375,7 +468,7 @@ class _SettingsItem extends StatelessWidget {
         decoration: BoxDecoration(
           border: isLast
               ? null
-              : const Border(
+              : Border(
                   bottom: BorderSide(
                     color: AppColors.divider,
                     width: 1,
@@ -452,7 +545,7 @@ class _ValueChevron extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        const Icon(
+        Icon(
           Icons.chevron_right,
           color: AppColors.textTertiary,
           size: 20,

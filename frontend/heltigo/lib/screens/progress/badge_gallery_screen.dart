@@ -278,9 +278,7 @@ class _BadgeGalleryScreenState extends State<BadgeGalleryScreen> {
     final filtered = _filtered;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -563,7 +561,7 @@ class _BadgeTile extends StatelessWidget {
                         shape: BoxShape.circle,
                         border: Border.all(color: AppColors.border),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.lock,
                         size: 10,
                         color: AppColors.textTertiary,

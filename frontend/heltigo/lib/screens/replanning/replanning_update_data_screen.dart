@@ -22,6 +22,7 @@ class _ReplanningUpdateDataScreenState
   // ─── State ───
   bool _weightConfirmed = false;
   final _waistController = TextEditingController(text: '86');
+  final _manualWeightController = TextEditingController();
   int _budgetChipIndex = 1; // 0=25K, 1=35K, 2=50K, 3=75K, 4=lainnya
   _BodyCondition _condition = _BodyCondition.prima;
 
@@ -35,7 +36,93 @@ class _ReplanningUpdateDataScreenState
   @override
   void dispose() {
     _waistController.dispose();
+    _manualWeightController.dispose();
     super.dispose();
+  }
+
+  Future<void> _showManualWeightDialog() async {
+    _manualWeightController.text = _currentWeight.toStringAsFixed(1);
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusCard),
+        ),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: AppDimensions.base,
+            right: AppDimensions.base,
+            top: AppDimensions.base,
+            bottom:
+                MediaQuery.of(ctx).viewInsets.bottom + AppDimensions.lg,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.border,
+                    borderRadius: BorderRadius.circular(
+                      AppDimensions.radiusFull,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppDimensions.base),
+              Text('Ubah Berat Manual', style: AppTextStyles.h3),
+              const SizedBox(height: AppDimensions.sm),
+              Text(
+                'Masukkan berat badan terbaru kamu dalam kg.',
+                style: AppTextStyles.body.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: AppDimensions.base),
+              TextField(
+                controller: _manualWeightController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                autofocus: true,
+                cursorColor: AppColors.primary,
+                decoration: const InputDecoration(
+                  suffixText: 'kg',
+                  hintText: '0.0',
+                ),
+                style: AppTextStyles.h2,
+              ),
+              const SizedBox(height: AppDimensions.base),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.white,
+                    elevation: 0,
+                    minimumSize: const Size.fromHeight(48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusButton,
+                      ),
+                    ),
+                  ),
+                  child: const Text('Simpan'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   int? get _waistDelta {
@@ -110,9 +197,7 @@ class _ReplanningUpdateDataScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -141,7 +226,7 @@ class _ReplanningUpdateDataScreenState
               child: ClipRRect(
                 borderRadius:
                     BorderRadius.circular(AppDimensions.radiusFull),
-                child: const LinearProgressIndicator(
+                child: LinearProgressIndicator(
                   value: 0.33,
                   minHeight: 4,
                   backgroundColor: AppColors.surfaceLight,
@@ -264,22 +349,11 @@ class _ReplanningUpdateDataScreenState
                           children: [
                             Expanded(
                               child: OutlinedButton(
-                                onPressed: () {
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(
-                                    const SnackBar(
-                                      content:
-                                          Text('Buka catat timbangan manual'),
-                                      behavior:
-                                          SnackBarBehavior.floating,
-                                      duration: Duration(seconds: 2),
-                                    ),
-                                  );
-                                },
+                                onPressed: _showManualWeightDialog,
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor:
                                       AppColors.textSecondary,
-                                  side: const BorderSide(
+                                  side: BorderSide(
                                     color: AppColors.border,
                                   ),
                                   shape: RoundedRectangleBorder(
@@ -307,10 +381,13 @@ class _ReplanningUpdateDataScreenState
                                       : Icons.check,
                                   size: 16,
                                 ),
-                                label: Text(
-                                  _weightConfirmed
-                                      ? 'Dikonfirmasi'
-                                      : 'Konfirmasi',
+                                label: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    _weightConfirmed
+                                        ? 'Dikonfirmasi'
+                                        : 'Konfirmasi',
+                                  ),
                                 ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: _weightConfirmed
@@ -354,7 +431,7 @@ class _ReplanningUpdateDataScreenState
                             color: AppColors.textPrimary,
                           ),
                           cursorColor: AppColors.primary,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.straighten,
                               color: AppColors.textTertiary,
@@ -558,7 +635,7 @@ class _ReplanningUpdateDataScreenState
                 AppDimensions.base +
                     MediaQuery.of(context).padding.bottom,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.background,
                 border: Border(
                   top: BorderSide(color: AppColors.divider, width: 1),

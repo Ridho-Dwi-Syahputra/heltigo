@@ -112,7 +112,7 @@ class _SetupPhysicalScreenState extends State<SetupPhysicalScreen> {
               color: AppColors.textPrimary,
             ),
             cursorColor: AppColors.primary,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: 'mis. 84',
               prefixIcon: Icon(
                 Icons.straighten,
@@ -129,7 +129,7 @@ class _SetupPhysicalScreenState extends State<SetupPhysicalScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
+              Icon(
                 Icons.lightbulb_outline,
                 size: 14,
                 color: AppColors.textTertiary,

@@ -55,7 +55,7 @@ class _MainScaffoldState extends State<MainScaffold> {
         children: _screens,
       ),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           border: Border(
             top: BorderSide(color: AppColors.border, width: 0.5),
           ),

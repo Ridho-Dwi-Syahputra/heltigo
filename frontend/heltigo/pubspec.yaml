@@ -46,6 +46,10 @@ dependencies:
   # Logging
   logger: ^2.5.0
 
+  # Camera & Image (food scan)
+  image_picker: ^1.1.2
+  permission_handler: ^11.3.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

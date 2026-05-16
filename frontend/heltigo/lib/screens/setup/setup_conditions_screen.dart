@@ -89,6 +89,44 @@ class _SetupConditionsScreenState extends State<SetupConditionsScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // ═══════════════════════════════════════
+          // MULTI-SELECT BADGE
+          // ═══════════════════════════════════════
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.sm,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryMuted,
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.radiusFull),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.check_circle_outline,
+                      size: 12,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Boleh pilih lebih dari satu',
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.sm),
+
+          // ═══════════════════════════════════════
           // CHECKBOX LIST
           // ═══════════════════════════════════════
           ...List.generate(_options.length, (i) {

@@ -158,9 +158,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -267,7 +265,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                 AppDimensions.base,
                 AppDimensions.base + MediaQuery.of(context).padding.bottom,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.background,
                 border: Border(
                   top: BorderSide(color: AppColors.divider, width: 1),
@@ -503,7 +501,7 @@ class _FoodRowCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppDimensions.xs),
-            const Icon(
+            Icon(
               Icons.chevron_right,
               color: AppColors.textTertiary,
               size: 20,

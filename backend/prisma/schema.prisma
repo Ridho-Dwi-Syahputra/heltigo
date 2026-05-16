@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  email           String    @unique @db.VarChar(255)
+  passwordHash    String    @map("password_hash") @db.VarChar(255)
+  name            String    @db.VarChar(100)
+  avatarUrl       String?   @map("avatar_url") @db.VarChar(500)
+  emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamp()
+  lastLoginAt     DateTime? @map("last_login_at") @db.Timestamp()
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp()
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamp()
+
+  @@index([deletedAt], map: "idx_users_deleted_at")
+  @@map("users")
+}
+
+// Tambahkan model lainnya sesuai schema.sql jika dibutuhkan...

@@ -2,7 +2,7 @@
 ## AI-Powered Personal Health & Fitness App
 
 **Versi:** 1.0.0  
-**Tanggal:** 15 Mei 2026  
+**Tanggal Update:** 17 Mei 2026  
 **Target Kompetisi:** MSU iREX 2026  
 **Tim:** Hackathon Core3D
 
@@ -17,13 +17,14 @@
 5. [Arsitektur Sistem](#5-arsitektur-sistem)
 6. [4 Model AI yang Digunakan](#6-4-model-ai-yang-digunakan)
 7. [Cara Kerja Microservice](#7-cara-kerja-microservice)
-8. [Tech Stack Detail](#8-tech-stack-detail)
-9. [Database Schema](#9-database-schema)
-10. [API Endpoints](#10-api-endpoints)
-11. [Frontend Mobile (Flutter)](#11-frontend-mobile-flutter)
-12. [Offline-First Strategy](#12-offline-first-strategy)
-13. [Gamifikasi & Motivasi](#13-gamifikasi--motivasi)
-14. [Timeline Implementasi](#14-timeline-implementasi)
+8. [Gemini AI — Lapisan Enrichment](#8-gemini-ai--lapisan-enrichment)
+9. [Tech Stack Detail](#9-tech-stack-detail)
+10. [Database Schema](#10-database-schema)
+11. [API Endpoints](#11-api-endpoints)
+12. [Frontend Mobile Flutter](#12-frontend-mobile-flutter)
+13. [Sync & Offline Queue](#13-sync--offline-queue)
+14. [Gamifikasi & Motivasi](#14-gamifikasi--motivasi)
+15. [Cara Menjalankan](#15-cara-menjalankan)
 
 ---
 
@@ -46,11 +47,10 @@ Program latihan dan diet konvensional memiliki tingkat kegagalan yang tinggi:
 
 Heltigo adalah aplikasi mobile berbasis AI yang menyediakan program latihan dan nutrisi personal yang:
 - **Adaptif real-time** berdasarkan kondisi fisik dan psikologis pengguna
-- **Budget-aware** dengan database 1.346+ makanan lokal Indonesia
-- **Hybrid offline-first** sehingga fitur kritis tetap berfungsi tanpa internet
-- **Tanpa wearable device** - hanya butuh smartphone
-- **Gamified** dengan streak, badge, dan motivasi AI untuk meningkatkan konsistensi
-
+- **Budget-aware** dengan database 1.346+ makanan lokal Indonesia, mulai Rp 15.000/hari
+- **Tanpa wearable device** — hanya butuh smartphone
+- **Gamified** dengan streak, badge, dan motivasi AI personal untuk meningkatkan konsistensi
+- **Didukung 4 model ML + Gemini AI** untuk personalisasi, analisis makanan, dan narasi motivasi
 
 ---
 
@@ -60,38 +60,25 @@ Heltigo adalah aplikasi mobile berbasis AI yang menyediakan program latihan dan 
 
 | Gap | Masalah Existing | Solusi Heltigo |
 |-----|------------------|----------------|
-| **G1: Integrasi Holistik** | Aplikasi fitness dan nutrisi terpisah, tidak terintegrasi | Single platform yang mengintegrasikan latihan, nutrisi, dan budget dalam satu pipeline AI |
-| **G2: Ketergantungan Wearable** | Butuh smartwatch/fitness tracker yang mahal (Rp 2-10 juta) | Hanya butuh smartphone, AI bekerja dengan input manual sederhana |
-| **G3: Database Makanan** | Fokus makanan Western (burger, pizza, salad) | 1.346 item makanan lokal Indonesia dengan estimasi harga |
-| **G4: Faktor Psikologis** | Hanya fokus data fisiologis (berat, tinggi, BMI) | Integrasi mood, energi, dan kualitas tidur untuk adaptasi real-time |
-| **G5: Privasi Data** | Data kesehatan dikirim ke cloud pihak ketiga | Hybrid offline-first, data sensitif terenkripsi, server isolated |
+| **G1: Integrasi Holistik** | Aplikasi fitness dan nutrisi terpisah | Single platform yang mengintegrasikan latihan, nutrisi, dan budget dalam satu pipeline AI |
+| **G2: Ketergantungan Wearable** | Butuh smartwatch/fitness tracker mahal | Hanya butuh smartphone, AI bekerja dengan input manual sederhana |
+| **G3: Database Makanan** | Fokus makanan Western | 1.346 item makanan lokal Indonesia dengan estimasi harga |
+| **G4: Faktor Psikologis** | Hanya fokus data fisiologis | Pre-workout check-in (mood, energi, tidur) untuk adaptasi real-time intensitas latihan |
+| **G5: Privasi Data** | Data kesehatan dikirim ke cloud pihak ketiga | Server isolated, ML service internal (tidak exposed ke public), API key tidak pernah sampai ke FE |
 
 ### 2.2 Masalah Spesifik yang Diselesaikan
 
-#### A. Personalisasi yang Tidak Memadai
-**Masalah:** Program latihan "one-size-fits-all" tidak mempertimbangkan:
-- Kondisi kesehatan khusus (cedera, diabetes, hipertensi)
-- Tingkat kebugaran saat ini
-- Ketersediaan alat (home vs gym)
-- Waktu yang tersedia (15-60 menit per sesi)
+**A. Personalisasi Tidak Memadai**  
+Heltigo menghasilkan program 7 hari yang disesuaikan dengan profil pengguna: kondisi kesehatan, fitness level, equipment tersedia (HOME/GYM/HYBRID), waktu yang tersedia, dan goal.
 
-**Solusi Heltigo:** AI menghasilkan program 7 hari yang disesuaikan dengan 13 parameter profil pengguna, termasuk kondisi kesehatan, fitness level, dan preferensi equipment.
+**B. Ketidaksesuaian Budget Nutrisi**  
+Meal planner AI menggunakan Knapsack + Genetic Algorithm untuk mengoptimalkan nilai gizi dalam batasan budget mulai Rp 15.000/hari, dengan database makanan lokal Indonesia yang terjangkau.
 
-#### B. Ketidaksesuaian Budget Nutrisi
-**Masalah:** Rekomendasi makanan sehat sering mahal dan tidak realistis untuk budget harian Rp 15.000 - Rp 50.000.
+**C. Kurangnya Adaptasi Real-Time**  
+Pre-workout check-in (mood, energi, kualitas tidur) memicu intensity adjuster yang mengurangi atau menambah volume latihan secara otomatis sebelum sesi dimulai.
 
-**Solusi Heltigo:** Meal planner AI menggunakan algoritma knapsack untuk mengoptimalkan nilai gizi dalam batasan budget, dengan database makanan lokal yang terjangkau.
-
-#### C. Kurangnya Adaptasi Real-Time
-**Masalah:** Program latihan statis tidak menyesuaikan intensitas saat pengguna merasa lelah, sakit, atau kurang tidur.
-
-**Solusi Heltigo:** Pre-workout check-in (mood, energi, kualitas tidur) memicu AI intensity adjuster yang mengurangi atau menambah volume latihan secara otomatis.
-
-#### D. Rendahnya Konsistensi Jangka Panjang
-**Masalah:** 70% pengguna berhenti dalam 3 bulan pertama karena kurangnya motivasi dan feedback.
-
-**Solusi Heltigo:** Sistem gamifikasi dengan streak tracking, 15 badge pencapaian, weekly review dengan AI insights, dan notifikasi motivasi personal.
-
+**D. Rendahnya Konsistensi Jangka Panjang**  
+Sistem gamifikasi dengan streak tracking, 15 badge pencapaian, weekly review dengan narasi AI personal (Gemini), dan notifikasi motivasi.
 
 ---
 
@@ -102,54 +89,28 @@ Heltigo adalah aplikasi mobile berbasis AI yang menyediakan program latihan dan 
 Heltigo memenuhi kriteria kompetisi innovation & research excellence:
 
 1. **Innovation in AI Application**
-   - Hybrid ML approach: Random Forest + Knapsack optimization + Rule-based adjuster
-   - Real-time intensity adaptation berdasarkan faktor psikologis
-   - Budget-aware meal planning dengan constraint optimization
+   - Hybrid AI: ML numerik (XGBoost, Knapsack+GA) + Generative AI (Gemini) untuk narasi personal
+   - Pre-workout intensity adaptation berdasarkan faktor psikologis
+   - Food scan: Gemini Vision → TF-IDF cosine matching → XGBoost health score
 
 2. **Social Impact**
-   - Target: 100 juta+ orang Indonesia dengan smartphone yang tidak mampu personal trainer
-   - Mengatasi obesitas dan PTM dengan solusi terjangkau (gratis)
-   - Mendukung ekonomi lokal dengan database makanan Indonesia
+   - Target: 100 juta+ orang Indonesia yang tidak mampu personal trainer
+   - Meal planning mulai Rp 15.000/hari dengan optimasi gizi
+   - Mendukung pola makan halal dan makanan lokal Indonesia
 
 3. **Technical Excellence**
-   - Microservice architecture (Flutter + Express.js + FastAPI)
-   - Offline-first dengan sync queue untuk area dengan koneksi terbatas
-   - Property-based testing untuk reliability
+   - Microservice architecture: Flutter + Express.js/Node + FastAPI/Python
+   - Dual Gemini integration: Vision (ML service) + Enrichment text (backend)
+   - Prisma ORM dengan 19 tabel relasional MySQL
 
 ### 3.2 Relevansi untuk Masyarakat Indonesia
 
-#### A. Aksesibilitas Ekonomi
 - **Gratis** vs personal trainer Rp 500K-2jt/bulan
 - **Budget meal planning** mulai Rp 15.000/hari
-- **Tidak butuh gym membership** - home workout dengan bodyweight
-
-#### B. Relevansi Budaya
-- **Database makanan lokal**: nasi goreng, gado-gado, soto, tempe, tahu
+- **Tidak butuh gym membership** — home workout dengan bodyweight tersedia
 - **Bahasa Indonesia** sebagai bahasa utama
 - **Halal-aware** meal planning
-
-#### C. Infrastruktur
-- **Hybrid offline-first** untuk area dengan koneksi internet tidak stabil
-- **Ringan** - hanya butuh smartphone Android 5.0+ atau iOS 12+
-- **Tidak butuh wearable** - input manual sederhana
-
-### 3.3 Potensi Dampak Jangka Panjang
-
-#### Kesehatan Publik
-- Menurunkan prevalensi obesitas melalui program personal yang sustainable
-- Mencegah PTM (diabetes, hipertensi) dengan intervensi dini
-- Meningkatkan literasi kesehatan masyarakat
-
-#### Ekonomi
-- Mengurangi biaya kesehatan nasional dari PTM (estimasi Rp 100 triliun/tahun)
-- Memberdayakan UMKM makanan sehat lokal
-- Menciptakan ekosistem data kesehatan untuk penelitian
-
-#### Teknologi
-- Benchmark untuk aplikasi AI kesehatan di Indonesia
-- Dataset longitudinal untuk penelitian adaptive health intervention
-- Open-source potential untuk komunitas developer
-
+- **Tidak butuh wearable** — input manual sederhana
 
 ---
 
@@ -157,170 +118,119 @@ Heltigo memenuhi kriteria kompetisi innovation & research excellence:
 
 ### 4.1 Setup Profil Cerdas (7 Langkah)
 
-**Wizard interaktif** yang mengumpulkan data untuk personalisasi AI:
+Wizard interaktif yang mengumpulkan data untuk personalisasi AI:
 
-1. **Data Dasar** - Nama, usia, gender
-2. **Data Fisik** - Tinggi, berat, lingkar pinggang
-3. **Hasil BMI** - Kalkulasi otomatis BMI, BMR, TDEE, % lemak tubuh
-4. **Target Kesehatan** - Turun berat / Jaga berat / Naikkan massa otot
-5. **Kondisi Khusus** - Cedera, diabetes, hipertensi, kehamilan
-6. **Preferensi Latihan** - Home/Gym, 3-5 hari/minggu, 15-60 menit/sesi
-7. **Budget & Diet** - Budget harian Rp 15K-100K, frekuensi makan, pantangan (halal, vegetarian, dll)
+1. **Data Dasar** — Nama, usia, gender
+2. **Data Fisik** — Tinggi, berat badan
+3. **BMI Result** — Kalkulasi otomatis BMI, BMR, TDEE
+4. **Target Kesehatan** — Turun berat / Jaga berat / Naikkan massa otot / Performa
+5. **Kondisi Khusus** — Cedera, diabetes, hipertensi, hamil (multi-select)
+6. **Preferensi Latihan** — HOME/GYM/HYBRID, hari/minggu, menit/sesi, fitness level
+7. **Budget & Diet** — Budget harian mulai Rp 15K, frekuensi makan, pantangan diet (halal, vegetarian, dll), waktu favorit latihan
 
-**Output:** AI menghasilkan program 7 hari pertama dalam ~6 detik.
+**Output:** Setelah save `health_profile`, user bisa generate plan — AI menghasilkan program 7 hari workout + meal dalam sekali call.
 
 ### 4.2 Program Latihan Personal
 
-#### A. Workout Recommender (AI Model 1)
-- **Input:** 13 fitur (BMI, age, fitness level, workout mode, kondisi kesehatan, dll)
-- **Output:** 7-day workout plan dengan 4-6 exercise per hari
-- **Adaptasi:** Warmup → Main → Cooldown, disesuaikan dengan equipment yang tersedia
+**A. Workout Plan Generation (ML Model 1)**
+- Input dari health profile + XGBoost type/intensity classifier
+- Schedule 7 hari berbasis template (fitness_level + goal) + condition overrides
+- Exercise per hari: WARMUP → MAIN → COOLDOWN
+- Adaptasi kondisi kesehatan: cedera → FLEXIBILITY, hamil → low impact, obese → kurangi HIIT
 
-#### B. Pre-Workout Check-in (AI Model 3)
-- **Input:** Mood (1-5), Energi (1-5), Kualitas tidur (<5 jam, 5-6, 6-7, 7-8, >8 jam)
-- **Output:** Adjustment factor -50% hingga +20% untuk volume latihan
-- **Contoh:** Mood 2, Energi 1, Tidur <5 jam → Volume dikurangi 40%, fokus teknik
+**B. Pre-Workout Check-in (Intensity Adjuster)**
+- Input: Mood (VERY_BAD/BAD/NEUTRAL/GOOD/VERY_GOOD), Energi (1-10), Sleep Band (<5h, 5-6, 6-7, 7-8, >8)
+- Logic rule-based di backend: `intensityAdjusterService.getMultiplier(mood, energy, sleepBand)`
+- Multiplier: 0.5 (min) – 1.5 (max) terhadap volume latihan
+- Membuat `WorkoutSession` dengan intensitas yang disesuaikan
 
-#### C. Active Workout Tracking
-- **Timer real-time** dengan countdown per set
-- **Rest timer** otomatis antar set
-- **Haptic feedback** saat selesai rep
-- **Wakelock** agar layar tidak mati
-- **Log per-exercise:** sets, reps, rest actual
+**C. Active Workout Tracking**
+- Log per set: reps actual, durasi, berat yang diangkat, rest actual
+- Pause session (dicatat di notes)
+- Wakelock (`wakelock_plus`) agar layar tidak mati
 
-#### D. Workout Complete & Insights
-- **Summary:** Durasi, total sets, total reps, kalori terbakar (estimasi)
-- **Perbandingan:** vs latihan sebelumnya (+X reps, +X menit)
-- **Badge unlock:** Jika mencapai milestone
-- **Streak update:** +1 hari jika konsisten
+**D. Workout Complete + Gemini Motivasi**
+- Hitung kalori terbakar: `weight_kg × 0.1 × durationMin × intensityMultiplier`
+- Update streak (+1 hari jika konsisten)
+- Auto-check badge unlock (streak, workouts done, weight lost)
+- Gemini menghasilkan pesan selamat personal + tips recovery (1-2 kalimat Bahasa Indonesia)
 
 ### 4.3 Meal Planning Budget-Aware
 
-#### A. Meal Planner (AI Model 2)
-- **Algoritma:** 0/1 Knapsack optimization per meal
-- **Constraint:** Budget harian, target kalori ±15%, macro balance
-- **Scoring:** Protein > Kalori > Serat, penalti lemak
-- **Output:** 2-4 meals per hari × 7 hari
+**A. Meal Plan Generation (ML Model 2)**
+- Algoritma: Knapsack scoring + Genetic Algorithm (DEAP, 20 populasi, 30 generasi)
+- Constraint: Budget harian (HARD), kalori target ±15% (SOFT), diversifikasi menu antar hari
+- Output: 7 hari × 2-4 meals/hari × 1-4 foods/meal
 
-#### B. Meal Swap & Alternatives
-- **Trigger:** User tap "Minta Alternatif" di meal detail
-- **Logic:** Re-run knapsack dengan exclude current foods
-- **Diversifikasi:** Tidak ulang menu utama 2 hari berturut
+**B. Meal Swap Alternatives**
+- Trigger: User tap "Cari Alternatif" di meal detail
+- Backend call ML `predictMealAlternatives` → top 3 alternatif dalam kategori sama
+- Gemini enrich tiap alternatif dengan 1 kalimat alasan kenapa cocok untuk goal user
 
-#### C. Meal Logging
-- **Checklist:** Tandai sudah makan per meal
-- **Idempotent:** Tidak bisa double-log
-- **Aggregation:** Total kalori, protein, karbo, lemak per hari
+**C. Meal Logging**
+- Tandai meal sudah dimakan → update `meal_logs` + `daily_logs.caloriesConsumed`
+- Idempotent via `upsert` (tidak bisa double-log)
+- Auto-update badge check setelah log
 
-#### D. Food Item Detail
-- **Nutrisi lengkap:** Kalori, protein, karbo, lemak, serat per porsi
-- **Harga estimasi:** Berdasarkan kategori dan kalori
-- **Similar foods:** Rekomendasi alternatif dengan nutrisi serupa
+**D. Budget Update**
+- User bisa ubah budget harian minimum Rp 10.000
+- Tersimpan ke `health_profiles.budget_per_day_idr`
+- Hint: apply sepenuhnya saat replan berikutnya
 
-### 4.4 Progress Tracking & Gamifikasi
+### 4.4 Food Scan dengan Kamera (AI Model 4 + Gemini Vision)
 
-#### A. Daily Dashboard
-- **Kalori sisa:** Target - consumed + burned
-- **Hidrasi:** X/8 gelas (increment-only, reset tiap hari)
-- **Streak:** 🔥 X hari berturut-turut
-- **Workout hari ini:** Status + tombol "Mulai Latihan"
-- **Meal checklist:** ✅/⭕ per waktu makan
+**Flow:**
+1. User foto makanan dengan kamera / pilih dari galeri (`image_picker`)
+2. FE compress + encode ke base64
+3. FE `POST /api/v1/meal/food-scan { imageBase64 }`
+4. Backend forward ke ML service `POST /predict/food-scan`
+5. ML: Gemini Vision identifikasi nama makanan dari gambar
+6. ML: TF-IDF + cosine similarity → match ke 1.346 food item database
+7. ML: XGBoost health scorer → GOOD/MODERATE/POOR + health_score (0-1)
+8. Backend: Gemini enrich → saran keseimbangan + tips konkret (2 kalimat)
+9. FE tampilkan: daftar makanan teridentifikasi + nutrisi total + assessment + Gemini advice
+10. (Opsional) User konfirmasi → kalori dicatat ke daily_logs
 
-#### B. Weekly Review
-- **Skor mingguan:** 0-100% (workout done + meal logged + weight progress)
-- **Insights AI:** "Latihan paling sering diskip: Squat. Akan diganti otomatis."
-- **Charts:** Bar chart workout compliance, line chart weight progress
-- **Rekomendasi:** Strategi minggu depan (REDUCE / MAINTAIN / INTENSIFY)
+### 4.5 Progress Tracking & Gamifikasi
 
-#### C. Streak & Badges
-- **Current streak:** Hari berturut-turut aktif
-- **Best streak:** Record tertinggi
-- **15 badges:** Streak 3/7/30, Workouts 10/50/100, Weight lost 1/5/10 kg, dll
-- **Progress bar:** Menuju unlock badge berikutnya
+**A. Daily Dashboard**
+- Kalori consumed vs burned (dari daily_logs)
+- Hidrasi: X/8 gelas — update via `PATCH /progress/daily/water`
+- Mood log via `POST /progress/daily/mood`
+- Workout status hari ini + streak aktif
 
-#### D. Weight History
-- **Line chart:** 4 minggu terakhir
-- **Zona target:** Shaded area untuk target weight
-- **Delta:** +/- kg dari minggu lalu
-- **Estimasi:** "X minggu lagi mencapai target"
+**B. Weekly Review**
+- Skor mingguan: 0-100 (50% workout completion + 50% meal compliance)
+- Delta berat: sekarang vs start_weight
+- Charts: bar workout compliance, data per hari
+- Rekomendasi: REDUCE / MAINTAIN / INTENSIFY (dari ML replan)
 
+**C. Streak & Badges**
+- Streak dihitung dari `daily_logs.workoutCompleted` secara consecutif
+- Tersimpan di tabel `streaks` (currentStreak, bestStreak, activeDates)
+- Badge auto-unlock saat complete workout / log meal
 
-### 4.5 Adaptive Replanning (AI Model 4)
+### 4.6 Adaptive Replanning (ML Model 3)
 
-**Trigger:** Setiap Sunday 20:00 atau manual dari Weekly Review
+**Trigger:** Manual dari Weekly Review atau setelah 7 hari aktif
 
-#### A. Evaluasi Mingguan
-- **Skor:** Workout done / total × 50% + Meal logged / total × 30% + Weight progress × 20%
-- **Analisis:** Latihan yang sering diskip, meal yang sering dilewati
-- **Weight diff:** Actual vs target change
+**Flow:**
+1. Backend load 7-hari workout_sessions + meal_logs + daily_logs
+2. Hitung weekly_score (scoringService) dan weight_diff
+3. Panggil ML `/predict/replan` → volume_multiplier + action (REDUCE/MAINTAIN/INTENSIFY)
+4. Gemini enrich → 2 kalimat narasi personal (rangkuman minggu + alasan)
+5. (Opsional) `applyImmediately: true` → trigger regenerate plan baru
 
-#### B. Strategi Replanning
-| Skor | Strategi | Aksi |
-|------|----------|------|
-| <50% | **REDUCE** | Volume -30%, difficulty turun 1 level, fokus konsistensi |
-| 50-80% | **MAINTAIN_SWAP** | Volume sama, swap exercise yang sering diskip |
-| >80% | **INTENSIFY** | Volume +15%, difficulty naik, tambah variasi |
+**Multiplier range:** 0.5 (min, REDUCE) – 1.5 (max, INTENSIFY)
 
-#### C. User Choice Override
-- **KEEP:** Pertahankan program saat ini
-- **MODERATE:** Ubah sedikit (default AI)
-- **AGGRESSIVE:** Ubah signifikan (untuk yang bosan)
+### 4.7 Smart Notifications
 
-#### D. New Plan Ready
-- **Preview:** 7 hari baru dengan highlight perubahan
-- **AI Notes:** "Skor minggu ini 85%. Performamu luar biasa! Saya naikkan intensitas."
-- **Motivasi:** Disesuaikan dengan performa (encouragement vs challenge)
-
-### 4.6 Smart Notifications
-
-#### A. Workout Reminder
-- **Waktu:** User-defined (default 18:00)
-- **Pesan:** "Waktunya latihan! Hari ini: Push & Core (30 menit)"
-- **Pre-reminder:** 15 menit sebelum
-
-#### B. Meal Reminder
-- **Waktu:** Per meal type (breakfast 07:00, lunch 12:00, dinner 19:00)
-- **Pesan:** "Jangan lupa sarapan! Menu hari ini: Nasi goreng + telur (Rp 12.000)"
-
-#### C. Hydration Reminder
-- **Frekuensi:** Setiap 1-3 jam (user-defined)
-- **Pesan:** "Minum air! Target: X/8 gelas"
-
-#### D. Streak Milestone
-- **Trigger:** Saat mencapai streak 3, 7, 30, 100 hari
-- **Pesan:** "🔥 Streak 7 hari! Kamu luar biasa konsisten!"
-
-#### E. Badge Unlocked
-- **Trigger:** Saat unlock badge baru
-- **Pesan:** "🏆 Badge baru: Workouts 10! Lihat koleksimu."
-
-#### F. Replan Due
-- **Trigger:** Hari ke-8 plan aktif
-- **Pesan:** "Minggu ini selesai! Yuk evaluasi dan buat rencana minggu depan."
-
-### 4.7 Offline-First Features
-
-#### A. Fitur yang Berfungsi Offline
-- ✅ Lihat plan workout & meal (dari cache)
-- ✅ Centang exercise/meal selesai (enqueue untuk sync)
-- ✅ Active workout tracking (timer lokal)
-- ✅ Add weight log (enqueue)
-- ✅ Kalkulasi BMI/BMR/TDEE (pure Dart)
-- ✅ Notifikasi pengingat (flutter_local_notifications)
-
-#### B. Fitur yang Butuh Online
-- ❌ Signup / Login
-- ❌ Generate plan pertama (butuh ML)
-- ❌ Pre-workout check-in dengan ML adjust (fallback: pakai original)
-- ❌ Meal swap alternatives (fallback: tampilkan pesan)
-- ❌ Weekly report agregasi (fallback: tampilkan cached)
-
-#### C. Sync Queue
-- **Enqueue:** Saat offline, aksi disimpan ke Hive box `sync_queue`
-- **Drain:** Saat online kembali, batch-upload ke `/sync/batch`
-- **Idempotent:** Setiap aksi punya UUID, server deduplikasi
-- **Indicator:** Banner "📡 Mode Offline - X aksi belum disinkronkan"
-
+- **Workout Reminder** — waktu yang user setting
+- **Meal Reminder** — per meal type
+- **Streak Milestone** — saat tercapai 3, 7, 30 hari berturut
+- **Badge Unlocked** — saat unlock badge baru
+- **Replan Due** — setelah 7 hari plan aktif
+- **FCM Token** — backend simpan per-device ke tabel `fcm_tokens`
 
 ---
 
@@ -329,348 +239,354 @@ Heltigo memenuhi kriteria kompetisi innovation & research excellence:
 ### 5.1 Arsitektur 3-Tier
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                     TIER 1: MOBILE CLIENT                        │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │  Flutter 3.x (Dart 3.x)                                   │  │
-│  │  - 47 screens (onboarding, setup, workout, meal, progress)│  │
-│  │  - Provider + GetIt (state management)                    │  │
-│  │  - Shared Preferences (cache)                             │  │
-│  │  - Local notifications                                     │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└────────────────────────┬────────────────────────────────────────┘
-                         │ HTTPS REST + JWT
-                         │ (online/offline hybrid)
-┌────────────────────────┴────────────────────────────────────────┐
-│                   TIER 2: BACKEND API                            │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │  Express.js (Node 20 + TypeScript)                        │  │
-│  │  - Auth (JWT + refresh token)                             │  │
-│  │  - Business logic (scoring, streak, badge)                │  │
-│  │  - Orchestration (call ML service)                        │  │
-│  │  - MySQL 8.0 (19 tables)                                  │  │
-│  │  - Redis (cache + rate limit)                             │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└────────────────────────┬────────────────────────────────────────┘
-                         │ HTTP Internal
-                         │ (backend ↔ ML service)
-┌────────────────────────┴────────────────────────────────────────┐
-│                   TIER 3: ML SERVICE                             │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │  FastAPI (Python 3.11)                                    │  │
-│  │  - Model 1: Workout Recommender (Random Forest)           │  │
-│  │  - Model 2: Meal Planner (Knapsack optimization)          │  │
-│  │  - Model 3: Intensity Adjuster (Rule-based table)         │  │
-│  │  - Model 4: Adaptive Replanner (Rule + optional DT)       │  │
-│  │  - scikit-learn, pandas, numpy, scipy                     │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────┐
+│                   TIER 1: MOBILE CLIENT                        │
+│  Flutter 3.x (Dart 3.10+, Android SDK min 21)                 │
+│  - go_router (routing), provider + get_it (state)             │
+│  - dio (HTTP), shared_preferences, flutter_secure_storage      │
+│  - fl_chart (charts), google_fonts, image_picker              │
+│  - connectivity_plus, wakelock_plus, uuid                      │
+└───────────────────┬───────────────────────────────────────────┘
+                    │ HTTPS + JWT Bearer token
+                    │ Base: http://10.0.2.2:3000/api/v1 (emulator)
+                    ▼
+┌───────────────────────────────────────────────────────────────┐
+│                   TIER 2: BACKEND API (port 3000)             │
+│  Express.js + TypeScript (Node 20)                            │
+│  - Prisma ORM → MySQL 8.0 (19 tabel)                          │
+│  - JWT access 15 min + refresh 7 hari (SHA256 hash di DB)     │
+│  - Zod validation, pino logging                               │
+│  - @google/generative-ai (Gemini enrichment layer)            │
+│  - axios (ML client dengan retry/backoff)                     │
+└───────────────────┬───────────────────────────────────────────┘
+                    │ HTTP + X-ML-KEY header
+                    │ url: http://localhost:8001
+                    ▼
+┌──────────────────────────────────────────────────────────────┐
+│                   TIER 3: ML SERVICE (port 8001)              │
+│  FastAPI + Python 3.11                                        │
+│  Model 1: Workout Recommender (XGBoost v3 + Rules Config)    │
+│  Model 2: Meal Planner (Knapsack + GA dengan DEAP)           │
+│  Model 3: Adaptive Replanner (XGBoost Regressor)             │
+│  Model 4: Food Scan (TF-IDF + cosine + XGBoost scorer)       │
+│  + Gemini Vision (google-generativeai 0.7.0) untuk food scan  │
+└──────────────────────────────────────────────────────────────┘
+                    │ HTTPS
+                    ▼
+              Gemini API (Google AI Studio)
+              gemini-1.5-flash — dual role:
+              [ML] Vision (identifikasi makanan dari foto)
+              [Backend] Enrichment teks personal (4 method)
 ```
 
-### 5.2 Data Flow: Plan Generation
+### 5.2 Komponen Kunci
+
+| Komponen | Detail |
+|----------|--------|
+| **Prisma ORM** | Type-safe DB access, auto-migration, BigInt ID, Decimal untuk nilai finansial |
+| **ML Client** | `ml.client.ts` — axios, timeout 10s, retry 2x backoff eksponensial (300ms→600ms→1200ms) |
+| **Auth** | JWT access 15 menit, refresh token 7 hari disimpan hashed (SHA256) di tabel `refresh_tokens`, rotation saat refresh |
+| **Gemini Service** | `gemini.service.ts` — 4 method, timeout 3s, fallback statis Bahasa Indonesia jika Gemini down/kosong |
+| **Sync** | `POST /sync/batch` — idempotent via `sync_ops_log (userId + opId unique)`, support 5 opType |
+
+### 5.3 Data Flow: Plan Generation
 
 ```
-1. User selesai setup wizard (S-12)
-   ↓
-2. Frontend POST /user/health-profile (save profil)
-   ↓
-3. Frontend POST /plan/generate
-   ↓
-4. Backend collect health_profile + user data
-   ↓
-5. Backend POST http://ml:8000/predict/workout-plan
-   ├─ ML Model 1 (Workout RF) generate 7-day workout
-   └─ Return: { days: [...] }
-   ↓
-6. Backend POST http://ml:8000/predict/meal-plan
-   ├─ ML Model 2 (Meal Knapsack) generate 7-day meal
-   └─ Return: { days: [...] }
-   ↓
-7. Backend save ke MySQL:
-   ├─ workout_plans → workout_days → exercises
-   └─ meal_plans → meal_days → meal_times → food_items
-   ↓
-8. Backend return { workoutPlan, mealPlan } ke frontend
-   ↓
-9. Frontend cache ke Shared Preferences
-   ↓
-10. Frontend navigate ke Plan Ready screen (S-14)
+[Setup Wizard selesai — user save health profile]
+         │
+         │ POST /user/health-profile
+         ▼
+   Backend simpan ke health_profiles
+         │
+         │ POST /plan/generate
+         ▼
+   Backend baca HealthProfile
+   Hitung BMI, BMR, TDEE (healthService)
+         │
+         ├──────────────────────────────┐
+         │ POST /predict/workout-plan   │ POST /predict/meal-plan
+         │ (ML service port 8001)       │ (ML service port 8001)
+         ▼                             ▼
+   XGBoost + Rules → 7 hari       Knapsack + GA → 7 hari
+   workout plan                   meal plan
+         │                             │
+         └──────────────┬──────────────┘
+                        │
+                        ▼
+         Backend $transaction (Prisma):
+         - Archive old active plans
+         - INSERT workout_plans → workout_days → exercises
+         - INSERT meal_plans → meal_days → meal_times → food_items
+                        │
+                        ▼
+         Return plan lengkap dengan nested data (IDs real dari DB)
+                        │
+                        ▼
+         [plan_ready_screen] — FE tampilkan
 ```
 
-### 5.3 Data Flow: Pre-Workout Check-in
+### 5.4 Data Flow: Workout Session
 
 ```
-1. User tap "Mulai Latihan" di Workout Day screen (S-17)
-   ↓
-2. Frontend navigate ke Pre-Workout Check-in (S-19)
-   ↓
-3. User input: mood (1-5), energy (1-5), sleep_band
-   ↓
-4. Frontend POST /workout/:dayId/check-in
-   ↓
-5. Backend lookup workout_day exercises
-   ↓
-6. Backend call intensity adjuster (Model 3):
-   ├─ Lookup adjustment table: (energy, sleep_band) → multiplier
-   ├─ Apply mood modifier: ±5%
-   └─ Clamp to [-0.5, +0.2]
-   ↓
-7. Backend apply adjustment ke exercises:
-   ├─ sets × (1 + adjustment)
-   ├─ reps × (1 + adjustment)
-   └─ rest_sec × (1 - adjustment) jika volume turun
-   ↓
-8. Backend create workout_session (status: IN_PROGRESS)
-   ↓
-9. Backend return { sessionId, adjustedExercises }
-   ↓
-10. Frontend navigate ke Active Workout (S-20) dengan adjusted plan
+[Pre-workout check-in]
+   Input: mood, energy, sleepBand
+         │
+         │ POST /workout/:dayId/check-in
+         ▼
+   intensityAdjusterService.getMultiplier(...)
+   → multiplier 0.5 – 1.5
+   INSERT workout_sessions (status=IN_PROGRESS)
+         │
+   [Active Workout — tiap set]
+   PATCH /workout/session/:id/exercise
+   → INSERT exercise_logs
+         │
+   [Selesai latihan]
+   POST /workout/session/:id/complete
+         │
+         ├─ Hitung durasi + kalori terbakar
+         ├─ UPDATE workout_sessions (COMPLETED)
+         ├─ UPDATE workout_days.isCompleted=true
+         ├─ UPSERT daily_logs
+         ├─ UPDATE streaks
+         ├─ badgeService.checkUnlocks
+         └─ geminiService.enrichWorkoutComplete → pesan personal
+         │
+         ▼
+   [workout_complete_screen] tampilkan stats + Gemini message + badge baru
 ```
-
-### 5.4 Data Flow: Weekly Replanning
-
-```
-1. Trigger: Sunday 20:00 notification ATAU user tap "Lihat Rencana" di Weekly Review (S-29)
-   ↓
-2. Frontend GET /progress/weekly-review
-   ├─ Backend aggregate: workout_done, meal_logged, weight_change
-   └─ Return: { score, highlights, insights }
-   ↓
-3. Frontend tampilkan Weekly Review Modal (S-34)
-   ↓
-4. User pilih strategi: KEEP / MODERATE / AGGRESSIVE
-   ↓
-5. Frontend POST /plan/replan { choice, previousPlanId, score, skippedExerciseIds }
-   ↓
-6. Backend determine strategy:
-   ├─ score <50% → REDUCE
-   ├─ score 50-80% → MAINTAIN_SWAP
-   └─ score >80% → INTENSIFY
-   ↓
-7. Backend POST http://ml:8000/predict/replan
-   ├─ ML Model 4 apply strategy ke previous plan
-   └─ Return: { workoutDays, mealDays, aiNotes }
-   ↓
-8. Backend save new plan (mark old plan status='COMPLETED')
-   ↓
-9. Backend return { workoutPlan, mealPlan, aiNotes }
-   ↓
-10. Frontend navigate ke New Plan Ready (S-35)
-```
-
 
 ---
 
 ## 6. 4 MODEL AI YANG DIGUNAKAN
 
-### 6.1 Model 1: Workout Recommender (Random Forest)
-
-#### Tujuan
-Generate 7-day workout plan yang personal berdasarkan profil fisiologis dan preferensi user.
-
-#### Algoritma
-**Random Forest Classifier (Multi-Output)**
-- Library: scikit-learn 1.4+
-- Hyperparameter: n_estimators=100, max_depth=10, min_samples_split=5
-- Training data: 973 rows → augmented ke ~6,800 rows (expand 7 hari per user)
-
-#### Input Features (13 fitur)
-| Fitur | Tipe | Range | Contoh |
-|-------|------|-------|--------|
-| `bmi` | float | 12-50 | 26.5 |
-| `bmi_cat_enc` | int | 0-3 | 2 (OVERWEIGHT) |
-| `gender_enc` | int | 0/1 | 0 (MALE) |
-| `age` | int | 10-100 | 28 |
-| `age_band_enc` | int | 0-3 | 1 (25-35) |
-| `fitness_level_enc` | int | 0-2 | 0 (BEGINNER) |
-| `mode_enc` | int | 0/1 | 1 (GYM) |
-| `days_per_week` | int | 3-5 | 4 |
-| `session_minutes` | int | 15-60 | 45 |
-| `day_index` | int | 0-6 | 0 (Senin) |
-| `is_first_day_of_week` | bool | 0/1 | 1 |
-| `has_injury` | bool | 0/1 | 0 |
-| `has_chronic_condition` | bool | 0/1 | 0 |
-
-#### Output
-- **workout_type** ∈ {STRENGTH, CARDIO, HIIT, FLEXIBILITY, REST}
-- **intensity_band** ∈ {LOW, MID, HIGH}
-
-#### Post-Processing (Rule-Based Composer)
-1. Filter exercise_master berdasarkan:
-   - workout_type & muscle_group
-   - equipment (HOME: bodyweight only, GYM: all)
-   - difficulty (sesuai fitness_level + intensity)
-2. Hindari kontraindikasi (e.g., JOINT_PAIN → exclude squat/lunge)
-3. Random sample untuk diversifikasi
-4. Set sets/reps/rest dari template per intensity
-5. Generate phase order: WARMUP → MAIN → COOLDOWN
-
-#### Evaluation Metrics
-- **Accuracy:** >70% per output (workout_type & intensity)
-- **F1-macro:** >0.65
-- **Inference latency:** <800ms per request
-
-#### Dataset
-- **Primary:** `gym_member_exercise_dataset` (973 rows)
-- **Augmentation:** Expand 1 user → 7 hari dengan synthetic label rules
-- **Validation:** 80/20 split, stratified by workout_type
+> **Penting:** Model yang "terlatih" menghasilkan artifact `.pkl` / `.npy`. Model yang bersifat rule-based menggunakan config JSON. Keduanya di-load saat startup ML service.
 
 ---
 
-### 6.2 Model 2: Meal Planner (Knapsack Optimization)
+### 6.1 Model 1: Workout Recommender
 
-#### Tujuan
-Generate 7-day meal plan yang mengoptimalkan nilai gizi dalam batasan budget harian.
+**File artifact:**
+- `workout_xgb_v3_type.pkl` — XGBoost classifier untuk workout_type
+- `workout_xgb_v3_intensity.pkl` — XGBoost classifier untuk intensity
+- `scaler_v3.pkl` — StandardScaler fitur
+- `workout_rules_config.json` — schedule templates + sets/reps/rest per intensity
 
-#### Algoritma
-**0/1 Knapsack (Greedy Approximation)**
-- Constraint: Budget per meal, target kalori ±15%, macro balance
-- Scoring: Protein > Kalori > Serat, penalti lemak
-- Diversifikasi: Tidak ulang menu utama 2 hari berturut
+**Arsitektur:**
+- XGBoost v3 dengan Knowledge Distillation (F1 ≈ 1.0 pada test set)
+- Schedule 7 hari digenerate dari `schedule_templates[fitness_level + "_" + goal]`
+- Exercise list dari `EXERCISE_MAP[workout_type]` dengan warmup/cooldown tetap
+- **Condition overrides**: INJURY/JOINT_PAIN → ubah HIIT/CARDIO ke FLEXIBILITY; PREGNANT → low impact; OBESE (BMI≥35) → kurangi HIIT ke CARDIO + turunkan intensity
 
-#### Input
-| Parameter | Tipe | Range | Contoh |
-|-----------|------|-------|--------|
-| `tdee` | int | 800-5000 | 2200 kkal |
-| `target_calorie_adj` | int | -500 to +500 | -350 (deficit) |
-| `budget_per_day_idr` | int | 5000-300000 | 35000 |
-| `meal_frequency` | int | 2-4 | 3 |
-| `diet_restrictions` | array | - | ["halal"] |
+**Input (dari health_profile):**
 
-#### Scoring Function
-```python
-score = (
-    w_protein × protein_g / price × 1000 +
-    w_calories × calories / price × 1000 +
-    w_fiber × fiber_g / price × 1000 +
-    w_fat_penalty × fat_g / price × 1000
-)
-```
-
-**Weights per goal:**
-| Goal | Protein | Calories | Fiber | Fat Penalty |
-|------|---------|----------|-------|-------------|
-| WEIGHT_LOSS | 0.5 | 0.2 | 0.3 | -0.2 |
-| MAINTENANCE | 0.4 | 0.3 | 0.2 | -0.1 |
-| MUSCLE_GAIN | 0.6 | 0.3 | 0.1 | 0.0 |
-
-#### Output
-- **7 meal_days**, each with 2-4 meals
-- **Per meal:** list of food_items dengan servings, calories, cost
-- **Aggregation:** total_calories, total_protein_g, total_carbs_g, total_fat_g, total_cost_idr
-
-#### Constraint Validation
-- ✅ `total_cost_idr ≤ budget_per_day`
-- ✅ `abs(total_calories - target) / target < 0.20`
-- ✅ `protein_g ≥ 15% of total_calories`
-- ✅ `fat_g ≤ 35% of total_calories`
-
-#### Dataset
-- **Primary:** `nutrition.csv` (1,346 Indonesian food items)
-- **Augmentation:** category, estimated_price_idr, is_halal, is_vegetarian, is_vegan, is_gluten_free
-- **Heuristic price:** `base_price[category] × (1 + calories/500)`
-
-#### Performance
-- **Latency:** <500ms per 7-day plan
-- **Budget compliance:** 100% (hard constraint)
-- **Calorie accuracy:** ±15% target
-
----
-
-### 6.3 Model 3: Pre-Workout Intensity Adjuster (Rule-Based)
-
-#### Tujuan
-Adjust volume latihan real-time berdasarkan kondisi psikologis user (mood, energi, kualitas tidur).
-
-#### Algoritma
-**Rule-Based Lookup Table (5×5 matrix)**
-- Input: energy (1-5), sleep_band (5 levels)
-- Output: adjustment multiplier [-0.5, +0.2]
-- Mood modifier: ±5% additional
-
-#### Adjustment Table
-| Energy | <5 jam | 5-6 jam | 6-7 jam | 7-8 jam | >8 jam |
-|--------|--------|---------|---------|---------|--------|
-| 1 (Sangat Lelah) | -0.40 | -0.35 | -0.30 | -0.25 | -0.20 |
-| 2 (Lelah) | -0.30 | -0.25 | -0.20 | -0.15 | -0.10 |
-| 3 (Normal) | -0.20 | -0.10 | 0.00 | +0.05 | +0.10 |
-| 4 (Energik) | -0.10 | 0.00 | +0.05 | +0.10 | +0.15 |
-| 5 (Sangat Energik) | -0.05 | +0.05 | +0.10 | +0.15 | +0.20 |
-
-#### Application
-```python
-factor = 1 + adjustment
-adjusted_sets = max(1, round(original_sets × factor))
-adjusted_reps = max(4, round(original_reps × factor))
-adjusted_rest = round(original_rest × (1 - adjustment)) if adjustment < 0 else original_rest
-```
-
-#### Contoh
-**Input:** mood=2, energy=1, sleep_band="<5"
-- Base adjustment: -0.40
-- Mood modifier: -0.05 (mood < 3)
-- Final adjustment: -0.45
-- Factor: 0.55 (volume dikurangi 45%)
-
-**Original plan:** 4 sets × 12 reps, rest 60s
-**Adjusted plan:** 2 sets × 7 reps, rest 87s
-
-#### Rationale
-- **Tidak butuh ML training** - logika deterministik, user trust tinggi
-- **Fast inference** - O(1) lookup, <10ms
-- **Explainable** - user bisa lihat "Volume dikurangi 40% karena energi rendah"
-
----
-
-### 6.4 Model 4: Adaptive Replanner (Rule-Based + Optional DT)
-
-#### Tujuan
-Re-generate plan minggu depan berdasarkan performa minggu sebelumnya.
-
-#### Algoritma
-**Rule-Based 3-Branch Strategy**
-1. **REDUCE** (score <50%): Volume -30%, difficulty turun 1 level
-2. **MAINTAIN_SWAP** (score 50-80%): Volume sama, swap exercise yang sering diskip
-3. **INTENSIFY** (score >80%): Volume +15%, difficulty naik
-
-**Optional:** Decision Tree kecil untuk fine-tune intensity multiplier (jika ada waktu training)
-
-#### Input
 | Parameter | Tipe | Contoh |
 |-----------|------|--------|
-| `score_percent` | float | 75.0 |
-| `workout_done_count` | int | 3 |
-| `workout_total_count` | int | 4 |
-| `meal_done_count` | int | 18 |
-| `meal_total_count` | int | 21 |
-| `weight_change_kg` | float | -0.6 |
-| `weight_target_change_kg` | float | -0.5 |
-| `most_skipped_exercise_ids` | array | [12, 15] |
-| `user_choice` | enum | "MODERATE" |
+| `fitness_level` | str | BEGINNER / INTERMEDIATE / ADVANCED |
+| `goal` | str | WEIGHT_LOSS / MUSCLE_GAIN / MAINTENANCE / PERFORMANCE |
+| `bmi` | float | 26.5 |
+| `age` | int | 28 |
+| `gender` | str | MALE / FEMALE |
+| `workout_mode` | str | HOME / GYM / HYBRID |
+| `days_per_week` | int | 3-7 |
+| `session_minutes` | int | 15-180 |
+| `has_injury` | bool | false |
+| `has_chronic` | bool | false |
+| `conditions` | list[str] | ["diabetes"] |
 
-#### Strategy Logic
-```python
-if score < 50:
-    strategy = "REDUCE"
-    notes = "Skor minggu ini rendah. Saya kurangi volume agar lebih mudah konsisten."
-elif score <= 80:
-    strategy = "MAINTAIN_SWAP"
-    notes = "Performa stabil. Saya pertahankan struktur, ganti latihan yang sering diskip."
-else:
-    strategy = "INTENSIFY"
-    notes = "Performa luar biasa! Saya naikkan intensitas dan tambah volume."
+**Output:**
+```json
+{
+  "days": [
+    {
+      "day_index": 0,
+      "workout_type": "STRENGTH",
+      "intensity": "MID",
+      "is_rest_day": false,
+      "estimated_minutes": 45,
+      "exercises": [
+        { "name": "Dynamic Stretching", "phase": "WARMUP", "sets": 1, "reps": 10, "rest_seconds": 30 },
+        { "name": "Push Up", "phase": "MAIN", "sets": 3, "reps": 12, "rest_seconds": 60 }
+      ]
+    }
+  ],
+  "model_version": "v3-knowledge-distillation"
+}
 ```
 
-#### Output
-- **ai_notes:** Penjelasan strategi
-- **ai_recommendation:** Motivasi personal
-- **workout_days:** 7-day adjusted workout
-- **meal_days:** 7-day adjusted meal (jika weight_diff signifikan)
+---
 
-#### Performance
-- **Latency:** <600ms
-- **User satisfaction:** Measured via feedback (Phase 4)
+### 6.2 Model 2: Meal Planner (Knapsack + Genetic Algorithm)
 
+**File artifact:**
+- `food_master_v3.parquet` — 1.346 item makanan lokal Indonesia
+- `knapsack_config_v3.json` — goal weights, meal splits per frekuensi
+
+**Algoritma:**
+
+1. **Scoring function** (Knapsack-style per food item):
+   ```
+   score = protein × w_protein / (price/1000)
+          + calories × w_cal / (price/1000)
+          - fat × w_fat_penalty / (price/1000)
+   ```
+
+2. **Genetic Algorithm** (DEAP library):
+   - Populasi: 20 individu (chromosome = indeks food per meal × 7 hari)
+   - Generasi: 30
+   - Crossover (one-point): 70%; Mutasi (uniform int): 20%
+   - Fitness: total score − penalti duplikasi STAPLE/PROTEIN antar 2 hari berurutan
+
+3. **Diversifikasi**: Penalty 2.0 jika food STAPLE/PROTEIN sama muncul dalam 3 hari terakhir
+
+**Goal Weights:**
+
+| Goal | Protein | Fiber | Fat Penalty | Cal Bonus |
+|------|---------|-------|-------------|-----------|
+| WEIGHT_LOSS | 0.40 | 0.30 | 0.20 | 0.10 |
+| MUSCLE_GAIN | 0.50 | 0.10 | 0.10 | 0.30 |
+| MAINTENANCE | 0.35 | 0.20 | 0.20 | 0.25 |
+| PERFORMANCE | 0.40 | 0.10 | 0.15 | 0.35 |
+
+**Meal Splits (dari `MEAL_SPLITS`):**
+- 2 meals: Breakfast 40%, Dinner 60%
+- 3 meals: Breakfast 28%, Lunch 40%, Dinner 32%
+- 4 meals: Breakfast 22%, Lunch 35%, Snack 10%, Dinner 33%
+
+**Input:**
+
+| Parameter | Tipe | Range | Default |
+|-----------|------|-------|---------|
+| `tdee` | int | 800-5000 | — |
+| `target_calorie_adj` | int | -800 to +800 | 0 |
+| `budget_per_day_idr` | int | **min 10.000** | 35.000 |
+| `meal_frequency` | int | 2-4 | 3 |
+| `goal` | str | — | MAINTENANCE |
+| `dietary_restrictions` | list[str] | halal/vegetarian/vegan | [] |
+| `excluded_food_ids` | list[int] | — | [] |
+
+**Output:**
+```json
+{
+  "days": [
+    {
+      "day_index": 0,
+      "total_calories": 1720.0,
+      "total_protein_g": 92.4,
+      "total_fat_g": 48.1,
+      "total_carbs_g": 220.3,
+      "total_cost_idr": 33500,
+      "meals": [
+        {
+          "meal_type": "BREAKFAST",
+          "total_calories": 480.0,
+          "total_cost_idr": 9000,
+          "foods": [
+            { "food_id": 12, "name": "Nasi uduk", "category": "STAPLE", "calories": 250, "protein_g": 5.0, "fat_g": 3.0, "carbs_g": 50.0, "price_idr": 5000, "is_halal": true }
+          ]
+        }
+      ]
+    }
+  ],
+  "diversity_score": 0.78,
+  "calorie_coverage_pct": 98.5,
+  "algorithm": "knapsack-ga-v3"
+}
+```
+
+---
+
+### 6.3 Model 3: Adaptive Replanner (XGBoost Regressor)
+
+**File artifact:**
+- `replanner_xgb.pkl` — XGBoost Regressor untuk prediksi volume_multiplier
+
+**Cara kerja:**
+
+Input 6 fitur → XGBoost predict → multiplier (di-clamp ke 0.5–1.5) → rule-based action:
+
+| Multiplier | Action | Rekomendasi |
+|-----------|--------|-------------|
+| < 0.85 | REDUCE | "Kurangi volume X%. Tubuh perlu lebih banyak recovery." |
+| 0.85 – 1.10 | MAINTAIN | "Pertahankan ritme yang ada." |
+| > 1.10 | INTENSIFY | "Tingkatkan volume X%. Progress bagus!" |
+
+**Input:**
+
+| Parameter | Tipe | Keterangan |
+|-----------|------|------------|
+| `weekly_score` | float | 0–100 (50% workout + 50% meal compliance) |
+| `weight_diff_kg` | float | weightKg − startWeightKg (negatif = turun BB) |
+| `bmi` | float | saat ini |
+| `experience_level` | int | 1=BEGINNER, 2=INTERMEDIATE, 3=ADVANCED |
+| `age` | int | usia user |
+| `workout_frequency` | int | frekuensi latihan per minggu yang direncanakan |
+
+**Output:**
+```json
+{
+  "volume_multiplier": 1.10,
+  "recommendation": "Tingkatkan volume 10%. Progress bagus, siap untuk tantangan lebih besar!",
+  "action": "INTENSIFY",
+  "model_version": "xgb-regressor"
+}
+```
+
+**Setelah ML:** Backend tambah narasi Gemini (2 kalimat personal) sebelum return ke FE.
+
+---
+
+### 6.4 Model 4: Food Scan Analyzer
+
+**Dua tahap:**
+
+#### Tahap 1 — Identifikasi Makanan (Gemini Vision, di ML service)
+- Model: `gemini-1.5-flash`
+- Input: base64 JPEG/PNG dari kamera
+- Prompt: "Identifikasi semua makanan yang terlihat... daftar nama Bahasa Indonesia, satu per baris"
+- Output: list nama makanan (mis. ["nasi goreng", "telur ceplok", "es teh"])
+- **Aktif hanya jika** `GEMINI_API_KEY` di ml-service `.env` terisi
+
+#### Tahap 2 — Analisis Nutrisi + Health Score (TF-IDF + XGBoost)
+
+**File artifact:**
+- `food_tfidf_vectorizer.pkl` — TF-IDF vectorizer nama makanan
+- `food_name_matrix.npy` — matrix TF-IDF pre-computed untuk 1.346 item
+- `nutrition_scorer.pkl` — XGBoost 3-class classifier (GOOD=2 / MODERATE=1 / POOR=0)
+- `scanner_config.json` — label_map, goal_map, condition_map
+- `alias_map.json` — normalisasi nama (mis. "nasi gor" → "nasi goreng")
+- `food_processed.parquet` — dataset makanan ter-preprocessed
+
+**Matching logic (per food):**
+1. Normalize: lowercase, remove accent, strip non-alphanumeric
+2. Check alias_map → remap jika ada alias
+3. TF-IDF transform → cosine similarity dengan seluruh food matrix
+4. Best match jika confidence ≥ 0.20, else null
+5. Hitung nutrisi per portion × user-defined portion multiplier
+
+**Health scoring:**
+```
+X_in = [total_cal, total_protein, total_fat, total_carb,
+        jumlah_makanan, goal_encoded, condition_encoded]
+→ XGBoost predict → GOOD / MODERATE / POOR + confidence score
+```
+
+**Output:**
+```json
+{
+  "identified_by_gemini": ["nasi goreng", "telur ceplok"],
+  "matches": [
+    { "query": "nasi goreng", "matched": "Nasi goreng kampung", "confidence": 0.91, "calories": 350.0, "protein_g": 12.0, "fat_g": 10.0, "carbs_g": 55.0, "category": "STAPLE", "is_halal": true }
+  ],
+  "nutrition_total": { "calories": 530.0, "protein_g": 20.0, "fat_g": 18.0, "carbs_g": 62.0 },
+  "health_score": 0.72,
+  "assessment": "MODERATE",
+  "user_goal": "WEIGHT_LOSS",
+  "user_condition": "None"
+}
+```
+
+**Setelah ML:** Backend tambah Gemini advice (2 kalimat: penilaian keseimbangan + tips konkret).
 
 ---
 
@@ -678,2434 +594,550 @@ else:
 
 ### 7.1 Komunikasi Antar Service
 
-#### A. Frontend ↔ Backend
-**Protocol:** HTTPS REST
-**Auth:** JWT Bearer token (access_token 15 min, refresh_token 7 hari)
-**Format:** JSON
+#### Frontend ↔ Backend
+- **Protocol:** HTTPS REST (dev: HTTP)
+- **Auth:** `Authorization: Bearer <accessToken>`
+- **Base URL (emulator):** `http://10.0.2.2:3000/api/v1`
+- **Format:** JSON
 
-**Request Example:**
-```http
-POST /api/v1/plan/generate HTTP/1.1
-Host: api.heltigo.app
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
+#### Backend ↔ ML Service
+- **Protocol:** HTTP internal (tidak di-expose ke public)
+- **Auth:** Header `X-ML-KEY: <ML_SERVICE_KEY>` — shared secret
+- **Port ML:** 8001 (bukan 8000)
+- **Format:** JSON
+- **Retry:** 2x dengan backoff 300ms → 600ms → 1200ms
+- **Timeout:** 10 detik per request
 
-{}
-```
+#### Backend ↔ Gemini API (enrichment)
+- **Protocol:** HTTPS via `@google/generative-ai` Node SDK
+- **Auth:** `GEMINI_API_KEY` — hanya ada di backend, tidak pernah ke FE
+- **Model:** `gemini-1.5-flash`
+- **Timeout:** 3 detik (fallback statis jika lewat)
 
-**Response Example:**
-```json
-{
-  "workoutPlan": {
-    "id": 42,
-    "startDate": "2026-05-19",
-    "endDate": "2026-05-25",
-    "days": [...]
-  },
-  "mealPlan": {
-    "id": 43,
-    "startDate": "2026-05-19",
-    "endDate": "2026-05-25",
-    "days": [...]
-  }
-}
-```
+#### ML Service ↔ Gemini API (Vision, food-scan only)
+- **Protocol:** HTTPS via `google-generativeai` Python SDK
+- **Auth:** `GEMINI_API_KEY` — di ml-service `.env`
+- **Model:** `gemini-1.5-flash`
 
-#### B. Backend ↔ ML Service
-**Protocol:** HTTP Internal (tidak exposed public)
-**Auth:** Shared secret header `X-ML-KEY`
-**Format:** JSON
+### 7.2 Error Mapping
 
-**Request Example:**
-```http
-POST /predict/workout-plan HTTP/1.1
-Host: ml-service:8000
-X-ML-KEY: dev-shared-secret
-Content-Type: application/json
+| Kondisi | Backend response ke FE |
+|---------|----------------------|
+| ML service mati | `502 ML_UNREACHABLE` |
+| ML timeout | `502 ML_TIMEOUT` |
+| ML response 5xx | `502 ML_ERROR` |
+| Gemini error/timeout | fallback statis (tidak error ke FE) |
+| Gemini API key kosong | fallback statis (tidak error ke FE) |
+| Validation gagal | `400 VALIDATION_ERROR` (Zod) |
+| Token expired | `401 TOKEN_EXPIRED` |
+| Refresh invalid | `401 REFRESH_INVALID` |
 
-{
-  "profile": {
-    "bmi": 26.5,
-    "bmi_category": "OVERWEIGHT",
-    "gender": "MALE",
-    "age": 28,
-    "fitness_level": "INTERMEDIATE",
-    "workout_mode": "GYM",
-    "days_per_week": 4,
-    "session_minutes": 45,
-    "conditions": []
-  }
-}
-```
+### 7.3 Pre-load Model saat Startup
 
-**Response Example:**
-```json
-{
-  "days": [
-    {
-      "day_index": 0,
-      "is_rest_day": false,
-      "estimated_minutes": 45,
-      "estimated_calories": 320,
-      "exercises": [
-        {
-          "exercise_item_id": "ex-001",
-          "order_in_day": 1,
-          "phase": "WARMUP",
-          "sets": 1,
-          "reps": 10,
-          "rest_seconds": 30,
-          "ai_tip": "Lakukan pelan, fokus pada teknik."
-        },
-        ...
-      ]
-    },
-    ...
-  ]
-}
-```
+Semua model di-load saat `FastAPI lifespan` startup (sebelum menerima request pertama). Ini menghindari cold-start latency di request pertama:
 
-### 7.2 Service Isolation & Deployment
-
-#### A. Containerization (Docker)
-
-**Backend Dockerfile:**
-```dockerfile
-FROM node:20-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["node", "dist/server.js"]
-```
-
-**ML Service Dockerfile:**
-```dockerfile
-FROM python:3.11-slim
-WORKDIR /app
-RUN apt-get update && apt-get install -y build-essential
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY app ./app
-COPY main.py .
-EXPOSE 8000
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
-```
-
-#### B. Docker Compose (Development)
-
-```yaml
-version: '3.8'
-services:
-  mysql:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: heltigo
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-
-  backend:
-    build: ./backend
-    ports:
-      - "3000:3000"
-    environment:
-      DATABASE_URL: mysql://root:root@mysql:3306/heltigo
-      REDIS_URL: redis://redis:6379
-      ML_SERVICE_URL: http://ml-service:8000
-      JWT_SECRET: dev-secret-key
-    depends_on:
-      - mysql
-      - redis
-      - ml-service
-
-  ml-service:
-    build: ./ml-service
-    ports:
-      - "8000:8000"
-    environment:
-      ML_SERVICE_KEY: dev-shared-secret
-    volumes:
-      - ./ml-service/app/data:/app/app/data
-
-volumes:
-  mysql_data:
-```
-
-#### C. Production Deployment (Render / Railway)
-
-**Backend:**
-- Platform: Render Web Service
-- Build: `npm install && npm run build`
-- Start: `node dist/server.js`
-- Env vars: `DATABASE_URL`, `REDIS_URL`, `ML_SERVICE_URL`, `JWT_SECRET`
-- Health check: `GET /health`
-
-**ML Service:**
-- Platform: Render Web Service (Docker)
-- Build: Docker
-- Env vars: `ML_SERVICE_KEY`
-- Health check: `GET /health`
-
-**MySQL:**
-- Platform: PlanetScale / Railway MySQL
-- Connection: SSL required
-
-**Redis:**
-- Platform: Upstash / Railway Redis
-- Connection: TLS required
-
-### 7.3 Error Handling & Resilience
-
-#### A. Backend → ML Service Timeout
-```typescript
-async function callMLService(endpoint: string, payload: any): Promise<any> {
-  try {
-    const response = await axios.post(`${ML_SERVICE_URL}${endpoint}`, payload, {
-      headers: { 'X-ML-KEY': ML_SERVICE_KEY },
-      timeout: 5000, // 5 detik
-    });
-    return response.data;
-  } catch (error) {
-    if (error.code === 'ECONNABORTED') {
-      logger.error('ML service timeout', { endpoint });
-      // Fallback: rule-based default plan
-      return generateFallbackPlan(payload);
-    }
-    throw new ApiError(500, 'ML_SERVICE_ERROR', 'Gagal generate plan');
-  }
-}
-```
-
-#### B. Frontend → Backend Retry
-```dart
-Future<T> withRetry<T>(Future<T> Function() task, {int maxAttempts = 3}) async {
-  var attempt = 0;
-  while (true) {
-    try {
-      return await task();
-    } on DioException catch (e) {
-      attempt++;
-      final shouldRetry = (e.type == DioExceptionType.connectionTimeout ||
-              e.type == DioExceptionType.connectionError ||
-              (e.response?.statusCode != null && e.response!.statusCode! >= 500)) &&
-          attempt < maxAttempts;
-      if (!shouldRetry) rethrow;
-      await Future.delayed(Duration(milliseconds: 500 * attempt));
-    }
-  }
-}
-```
-
-#### C. Circuit Breaker (Optional Phase 4)
-```typescript
-import CircuitBreaker from 'opossum';
-
-const mlServiceBreaker = new CircuitBreaker(callMLService, {
-  timeout: 5000,
-  errorThresholdPercentage: 50,
-  resetTimeout: 30000,
-});
-
-mlServiceBreaker.fallback(() => generateFallbackPlan());
-```
-
-### 7.4 Monitoring & Logging
-
-#### A. Structured Logging (Pino)
-```typescript
-import pino from 'pino';
-
-const logger = pino({
-  level: process.env.LOG_LEVEL || 'info',
-  transport: {
-    target: 'pino-pretty',
-    options: { colorize: true },
-  },
-});
-
-logger.info({ userId: 42, planId: 123 }, 'Plan generated successfully');
-logger.error({ error: err.message, stack: err.stack }, 'ML service call failed');
-```
-
-#### B. Health Check Endpoints
-**Backend:**
-```typescript
-app.get('/health', async (req, res) => {
-  const dbOk = await checkDatabaseConnection();
-  const redisOk = await checkRedisConnection();
-  const mlOk = await checkMLServiceHealth();
-
-  res.status(dbOk && redisOk && mlOk ? 200 : 503).json({
-    status: dbOk && redisOk && mlOk ? 'healthy' : 'degraded',
-    database: dbOk ? 'ok' : 'down',
-    redis: redisOk ? 'ok' : 'down',
-    mlService: mlOk ? 'ok' : 'down',
-    timestamp: new Date().toISOString(),
-  });
-});
-```
-
-**ML Service:**
 ```python
-@app.get("/health")
-async def health():
-    return {
-        "status": "ok",
-        "models_loaded": [
-            f"workout_rf={workout_recommender.is_loaded}",
-            f"meal_master={meal_planner.is_ready}",
-        ],
-        "timestamp": datetime.utcnow().isoformat(),
-    }
-```
-
-#### C. Performance Metrics (Optional)
-- **Prometheus + Grafana** untuk metrics collection
-- **Sentry** untuk error tracking
-- **Uptime Robot** untuk uptime monitoring
-
-
----
-
-## 8. TECH STACK DETAIL
-
-### 8.1 Frontend Mobile (Flutter)
-
-| Layer | Technology | Version | Alasan Pemilihan |
-|-------|------------|---------|------------------|
-| **Framework** | Flutter | 3.22.x | Cross-platform (Android + iOS), performa native, hot reload |
-| **Language** | Dart | 3.4.x | Type-safe, null-safety, async/await native |
-| **State Management** | Provider + GetIt | 6.x + 7.x | Lightweight, mudah dipelajari, cukup untuk scope hackathon |
-| **Routing** | GoRouter | 14.x | Declarative routing, deep linking support |
-| **HTTP Client** | Dio | 5.x | Interceptor mature, retry, timeout, auth header injection |
-| **Local Storage** | Shared Preferences | 2.x | Key-value storage untuk cache plan & settings |
-| **Notifications** | flutter_local_notifications | 17.x | Reminder offline, scheduled, cross-platform |
-| **Charts** | fl_chart | 0.68.x | Native Flutter, performant, customizable |
-| **Fonts** | google_fonts | 6.x | Inter font sesuai design system |
-| **Connectivity** | connectivity_plus | 6.x | Detect online/offline untuk sync queue |
-| **Image Picker** | image_picker | 1.1.x | Kamera + galeri untuk avatar upload |
-| **Permissions** | permission_handler | 11.x | Request camera/storage permissions |
-
-**Struktur Folder:**
-```
-lib/
-├── main.dart
-├── app.dart
-├── core/
-│   ├── theme/ (colors, text_styles, sizes)
-│   ├── router/ (app_router.dart)
-│   └── utils/ (date_utils, currency_formatter)
-├── providers/ (state management)
-├── screens/ (47 screens)
-│   ├── splash/
-│   ├── onboarding/
-│   ├── auth/
-│   ├── setup/
-│   ├── home/
-│   ├── workout/
-│   ├── meal/
-│   ├── progress/
-│   └── profile/
-├── widgets/ (reusable components)
-└── services/ (API client, notification service)
+@asynccontextmanager
+async def lifespan(app):
+    _load_models()   # workout XGBoost + scaler + rules
+    _load_data()     # meal parquet + knapsack config
+    _load()          # replanner XGBoost
+    _load()          # food scan: vectorizer + matrix + scorer
+    yield
 ```
 
 ---
 
-### 8.2 Backend API (Express.js)
+## 8. GEMINI AI — LAPISAN ENRICHMENT
 
-| Layer | Technology | Version | Alasan Pemilihan |
-|-------|------------|---------|------------------|
-| **Runtime** | Node.js | 20 LTS | Mature, large ecosystem, async I/O |
-| **Framework** | Express.js | 4.x | Minimalist, flexible, middleware-based |
-| **Language** | TypeScript | 5.x | Type safety, better DX, compile-time error detection |
-| **ORM** | Prisma | 5.x | Type-safe query builder, migration tool, schema-first |
-| **Database** | MySQL | 8.0 | ACID compliance, mature, wide hosting support |
-| **Cache** | Redis | 7.x | In-memory cache, rate limiting, session store |
-| **Auth** | jsonwebtoken | 9.x | JWT generation & verification |
-| **Password** | bcrypt | 5.x | Secure password hashing (cost 12) |
-| **Validation** | Zod | 3.x | Schema validation, type inference |
-| **Logging** | Pino | 8.x | Fast structured logging, JSON output |
-| **HTTP Client** | Axios | 1.x | Call ML service, retry logic |
-| **Testing** | Jest + Supertest | 29.x | Unit & integration testing |
+### 8.1 Filosofi
 
-**Struktur Folder:**
-```
-backend/
-├── src/
-│   ├── server.ts
-│   ├── app.ts
-│   ├── config/ (env, db)
-│   ├── middleware/ (auth, error, validate)
-│   ├── routes/ (auth, user, plan, workout, meal, progress)
-│   ├── controllers/ (request handlers)
-│   ├── services/ (business logic)
-│   ├── repositories/ (data access)
-│   ├── utils/ (logger, jwt, password)
-│   └── types/ (TypeScript types)
-├── prisma/
-│   ├── schema.prisma
-│   ├── migrations/
-│   └── seed.ts
-└── tests/
-```
+> **"ML jawab dengan angka, Gemini jawab dengan kata-kata."**
 
----
+ML model dilatih untuk akurasi numerik. Gemini mengubah output numerik menjadi narasi personal Bahasa Indonesia yang user-friendly, tanpa membebani reliabilitas sistem.
 
-### 8.3 ML Service (FastAPI)
+### 8.2 Dual Role Gemini
 
-| Layer | Technology | Version | Alasan Pemilihan |
-|-------|------------|---------|------------------|
-| **Framework** | FastAPI | 0.110.x | Async, Pydantic auto-validation, OpenAPI docs |
-| **Language** | Python | 3.11 | Native ML ecosystem |
-| **ML Library** | scikit-learn | 1.4.x | Random Forest, Decision Tree, Pipeline |
-| **Numerik** | numpy | 1.26.x | Array operations |
-| **Data** | pandas | 2.2.x | DataFrame manipulation |
-| **Optimization** | scipy | 1.12.x | Knapsack optimization |
-| **Serialization** | joblib | 1.3.x | Save/load trained models |
-| **Validation** | pydantic | 2.6.x | Request/response schemas |
-| **Server** | uvicorn | 0.27.x | ASGI server |
-| **Testing** | pytest + httpx | 8.x + 0.27.x | Async testing |
+| Role | Lokasi | Tujuan |
+|------|--------|--------|
+| **Gemini Vision** | ML service (Python) | Identifikasi nama makanan dari foto kamera |
+| **Gemini Text Enrichment** | Backend (Node.js) | Teks personal: motivasi, alasan, narasi mingguan |
 
-**Struktur Folder:**
-```
-ml-service/
-├── main.py
-├── app/
-│   ├── config.py
-│   ├── deps.py (auth middleware)
-│   ├── api/ (routers: workout, meal, replan, health)
-│   ├── schemas/ (Pydantic models)
-│   ├── services/ (ML logic)
-│   │   ├── workout_recommender.py
-│   │   ├── meal_planner.py
-│   │   ├── intensity_adjuster.py
-│   │   └── replanner.py
-│   └── data/ (trained models & master data)
-│       ├── workout_rf.joblib
-│       ├── food_master.parquet
-│       └── exercise_master.parquet
-├── notebooks/ (training notebooks)
-└── tests/
-```
+### 8.3 4 Method Enrichment (gemini.service.ts)
+
+| Method | Dipanggil saat | Output (maks 2 kalimat) |
+|--------|----------------|------------------------|
+| `enrichWorkoutComplete(stats)` | Selesai sesi workout | Selamat + tips recovery spesifik |
+| `enrichMealRecommendation(food)` | Tiap alternatif di swap meal | Alasan 1 kalimat kenapa cocok untuk goal |
+| `enrichReplanNarrative(metrics)` | Hasil weekly replan | Rangkuman minggu + alasan rekomendasi |
+| `enrichFoodScanAdvice(scan)` | Hasil food scan | Penilaian keseimbangan + 1 tips konkret |
+
+### 8.4 Reliability
+
+- **Timeout:** 3 detik (env `GEMINI_TIMEOUT_MS`)
+- **Fallback:** Template statis Bahasa Indonesia untuk setiap method
+- **Tidak pernah throw:** Error di-log (`pino warn`), caller selalu dapat string
+- **Tidak pernah blocking:** FE tidak pernah gagal hanya karena Gemini down
+- **Prompt design:** Bahasa Indonesia, tanpa emoji, tanpa heading, tanpa list, maks 2 kalimat
+
+### 8.5 Contoh Output Gemini
+
+**enrichWorkoutComplete:**
+> "Latihan Strength hari ini selesai dalam 43 menit dengan estimasi 280 kkal terbakar — performa luar biasa! Pastikan minum air cukup dan istirahat minimal 7 jam malam ini untuk pemulihan optimal."
+
+**enrichFoodScanAdvice:**
+> "Total 530 kkal dari nasi goreng + telur ceplok memberikan protein cukup, namun lemak mendekati batas atas untuk goal penurunan berat. Tambahkan sayur atau buah sebagai snack sore untuk meningkatkan serat dan kenyang lebih lama."
 
 ---
 
-### 8.4 Database (MySQL 8.0)
+## 9. TECH STACK DETAIL
 
-**19 Tabel:**
-1. `users` - Akun user
-2. `health_profiles` - Data kesehatan & preferensi
-3. `settings` - Pengaturan app
-4. `refresh_tokens` - JWT refresh tokens
-5. `fcm_tokens` - Push notification tokens
-6. `exercise_master` - Library 200 exercise
-7. `food_master` - Library 1,346 makanan Indonesia
-8. `workout_plans` - Plan workout 7 hari
-9. `workout_days` - 1 hari workout
-10. `exercises` - Exercise dalam workout_day
-11. `workout_sessions` - Actual session yang dijalankan
-12. `exercise_logs` - Log per-set per-exercise
-13. `meal_plans` - Plan meal 7 hari
-14. `meal_days` - 1 hari meal
-15. `meal_times` - Sarapan/makan siang/makan malam
-16. `food_items` - Item makanan dalam meal_time
-17. `meal_logs` - Riwayat user log makan
-18. `daily_logs` - Agregat aktivitas per hari
-19. `streaks` - Current & best streak
-20. `badges` - Master badge
-21. `user_badges` - Junction user-badge
-22. `notifications` - In-app notifications
-23. `sync_ops_log` - Idempotency tracking
+### 9.1 Frontend (Flutter)
 
-**Indexes Kritis:**
-- `users.email` (UNIQUE)
-- `workout_plans(user_id, is_active)` (composite)
-- `workout_days.date` (single)
-- `meal_logs(user_id, meal_time_id, food_item_id)` (UNIQUE, idempotent)
-- `daily_logs(user_id, date)` (UNIQUE)
+| Kategori | Package | Versi |
+|----------|---------|-------|
+| SDK | Flutter | 3.x (Dart 3.10+) |
+| Routing | go_router | 14.6.2 |
+| State | provider + get_it | 6.1.2 + 8.0.3 |
+| HTTP | dio | 5.7.0 |
+| Storage | shared_preferences + flutter_secure_storage | 2.3.5 + 9.2.4 |
+| Charts | fl_chart | 0.70.2 |
+| Fonts | google_fonts | 6.2.1 |
+| Camera | image_picker + permission_handler | 1.1.2 + 11.3.1 |
+| Connectivity | connectivity_plus | 6.1.4 |
+| Util | wakelock_plus, share_plus, uuid, intl | latest |
 
----
+**Target platform:** Android (API 21+), iOS (12+)
 
-### 8.5 Infrastructure & DevOps
+### 9.2 Backend (Express.js)
 
-| Component | Technology | Alasan |
-|-----------|------------|--------|
-| **Hosting (Backend)** | Render / Railway | Free tier, auto-deploy from GitHub, managed DB |
-| **Hosting (ML)** | Render (Docker) | Support Python + model files |
-| **Database** | PlanetScale / Railway MySQL | Managed, auto-backup, scaling |
-| **Cache** | Upstash Redis | Serverless Redis, free tier |
-| **Storage (Avatar)** | AWS S3 / Cloudinary | CDN, image optimization |
-| **CI/CD** | GitHub Actions | Auto-test + deploy on push |
-| **Monitoring** | Sentry (error) + Uptime Robot | Free tier |
-| **Version Control** | Git + GitHub | Standard |
+| Kategori | Package | Versi |
+|----------|---------|-------|
+| Framework | express | 4.19 |
+| Language | TypeScript | 5.4 + Node 20 |
+| ORM | @prisma/client + prisma | 5.22 |
+| Database | MySQL | 8.0 |
+| Auth | jsonwebtoken + bcrypt | 9.0 + 5.1 |
+| HTTP Client | axios | 1.6 |
+| Validation | zod | 3.22 |
+| Gemini SDK | @google/generative-ai | 0.24 |
+| Logging | pino + pino-http + pino-pretty | 8.x |
+| Security | helmet + cors | latest |
 
-**Deployment Flow:**
-```
-1. Developer push ke GitHub
-   ↓
-2. GitHub Actions trigger:
-   ├─ Run tests (Jest + pytest)
-   ├─ Build Docker images
-   └─ Deploy ke Render/Railway
-   ↓
-3. Render auto-deploy:
-   ├─ Backend: npm install → npm run build → node dist/server.js
-   └─ ML Service: Docker build → uvicorn main:app
-   ↓
-4. Health check pass → traffic routed
-```
+**Tidak menggunakan:** Redis, Docker (dev mode lokal), ~~Hive~~
 
+### 9.3 ML Service (FastAPI)
 
+| Kategori | Package | Versi |
+|----------|---------|-------|
+| Framework | fastapi + uvicorn | 0.111 + 0.30 |
+| ML | scikit-learn + xgboost | latest |
+| Data | pandas + numpy + pyarrow | latest |
+| Genetic Algo | deap | 1.4.1 |
+| Gemini Vision | google-generativeai | 0.7.0 |
+| Serialization | pydantic + pydantic-settings | 2.7 + 2.3 |
+| Performance | joblib + ujson | 1.4.2 + 5.10 |
+
+**Port:** 8001  
+**Startup:** pre-load semua model via `lifespan` event
 
 ---
 
-## 9. DATABASE SCHEMA
+## 10. DATABASE SCHEMA
 
-### 9.1 Tabel Users & Auth
+### 10.1 Overview (19 Tabel)
 
-#### users
-```sql
-CREATE TABLE users (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  name VARCHAR(100) NOT NULL,
-  avatar_url VARCHAR(500),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_email (email)
-);
-```
+**Core Users**
+- `users` — id, email, password_hash, name, avatar_url, last_login_at
+- `health_profiles` — age, gender, height_cm, weight_kg, start_weight_kg, target_weight_kg, fitness_level, goal, workout_mode, budget_per_day_idr, health_conditions (JSON), dietary_restrictions (JSON)
+- `settings` — theme (LIGHT/DARK/SYSTEM), language, timezone, notification prefs
+- `refresh_tokens` — token_hash (SHA256), expires_at, revoked_at
+- `fcm_tokens` — FCM push token per device (ANDROID/IOS/WEB)
 
-#### refresh_tokens
-```sql
-CREATE TABLE refresh_tokens (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  token VARCHAR(500) UNIQUE NOT NULL,
-  expires_at TIMESTAMP NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  INDEX idx_token (token),
-  INDEX idx_user_expires (user_id, expires_at)
-);
-```
+**Plans**
+- `workout_plans` — id, name, start_date, end_date, status, is_active, ml_metadata (JSON)
+- `workout_days` — day_number, date, workout_type, intensity, is_completed
+- `exercises` — name, category (WARMUP/MAIN/COOLDOWN), sets, reps, rest_sec, order_index
+- `exercise_master` — library latihan (slug, muscle_groups, equipment, video_url, instructions)
+- `meal_plans` — target_calories_per_day, target_protein_g, budget_per_day_idr
+- `meal_days` — day_number, date, total_calories, total_cost_idr
+- `meal_times` — meal_type (BREAKFAST/LUNCH/DINNER/SNACK), is_logged
+- `food_items` — name, portion, calories, protein_g, carbs_g, fat_g, estimated_cost_idr
+- `food_master` — library makanan (category, is_halal, is_vegetarian, image_url)
 
-#### fcm_tokens
-```sql
-CREATE TABLE fcm_tokens (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  token VARCHAR(500) NOT NULL,
-  device_type ENUM('ANDROID', 'IOS') NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  UNIQUE KEY unique_user_token (user_id, token)
-);
-```
+**Sessions & Logs**
+- `workout_sessions` — started_at, completed_at, duration_sec, calories_burned, effort_score, mood_before, energy_before, sleep_band_before, status (IN_PROGRESS/COMPLETED/ABANDONED)
+- `exercise_logs` — set_number, reps_actual, weight_kg, duration_actual_sec, is_completed
+- `meal_logs` — logged_at, actual_portion_gram (unique: userId + mealTimeId + foodItemId)
+- `daily_logs` — date, workout_completed, meals_logged_count, water_glasses, mood, calories_consumed, calories_burned (unique: userId + date)
+- `streaks` — current_streak, best_streak, last_active_date, active_dates (JSON array)
 
-### 9.2 Tabel Health Profile & Settings
+**Gamifikasi & Sosial**
+- `badges` — code, title, description, icon_name, category, criterion_type, criterion_value
+- `user_badges` — userId + badgeId + unlocked_at
+- `notifications` — type, title, body, action_url, is_read
+- `sync_ops_log` — op_id, op_type, status (OK/DUPLICATE/CONFLICT/ERROR), result_snapshot
 
-#### health_profiles
-```sql
-CREATE TABLE health_profiles (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT UNIQUE NOT NULL,
-  gender ENUM('MALE', 'FEMALE') NOT NULL,
-  age INT NOT NULL,
-  height_cm DECIMAL(5,2) NOT NULL,
-  weight_kg DECIMAL(5,2) NOT NULL,
-  waist_cm DECIMAL(5,2),
-  bmi DECIMAL(4,2) NOT NULL,
-  bmi_category ENUM('UNDERWEIGHT', 'NORMAL', 'OVERWEIGHT', 'OBESE') NOT NULL,
-  bmr INT NOT NULL,
-  tdee INT NOT NULL,
-  body_fat_percent DECIMAL(4,2),
-  goal ENUM('WEIGHT_LOSS', 'MAINTENANCE', 'MUSCLE_GAIN') NOT NULL,
-  target_weight_kg DECIMAL(5,2),
-  fitness_level ENUM('BEGINNER', 'INTERMEDIATE', 'ADVANCED') NOT NULL,
-  workout_mode ENUM('HOME', 'GYM') NOT NULL,
-  days_per_week INT NOT NULL,
-  session_minutes INT NOT NULL,
-  conditions JSON, -- ["JOINT_PAIN", "DIABETES", "HYPERTENSION"]
-  budget_per_day_idr INT NOT NULL,
-  meal_frequency INT NOT NULL,
-  diet_restrictions JSON, -- ["halal", "vegetarian"]
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-```
+### 10.2 Enums
 
-#### settings
-```sql
-CREATE TABLE settings (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT UNIQUE NOT NULL,
-  workout_reminder_enabled BOOLEAN DEFAULT TRUE,
-  workout_reminder_time TIME DEFAULT '18:00:00',
-  meal_reminder_enabled BOOLEAN DEFAULT TRUE,
-  hydration_reminder_enabled BOOLEAN DEFAULT TRUE,
-  hydration_interval_hours INT DEFAULT 2,
-  theme_mode ENUM('LIGHT', 'DARK', 'SYSTEM') DEFAULT 'SYSTEM',
-  language VARCHAR(10) DEFAULT 'id',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-```
-
-### 9.3 Tabel Master Data
-
-#### exercise_master
-```sql
-CREATE TABLE exercise_master (
-  id VARCHAR(50) PRIMARY KEY, -- 'ex-001'
-  name VARCHAR(200) NOT NULL,
-  muscle_group ENUM('CHEST', 'BACK', 'LEGS', 'SHOULDERS', 'ARMS', 'CORE', 'CARDIO', 'FULL_BODY') NOT NULL,
-  equipment ENUM('BODYWEIGHT', 'DUMBBELL', 'BARBELL', 'MACHINE', 'CABLE', 'RESISTANCE_BAND') NOT NULL,
-  difficulty ENUM('BEGINNER', 'INTERMEDIATE', 'ADVANCED') NOT NULL,
-  contraindications JSON, -- ["JOINT_PAIN", "BACK_INJURY"]
-  video_url VARCHAR(500),
-  thumbnail_url VARCHAR(500),
-  description TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_muscle_equipment (muscle_group, equipment),
-  INDEX idx_difficulty (difficulty)
-);
-```
-
-#### food_master
-```sql
-CREATE TABLE food_master (
-  id VARCHAR(50) PRIMARY KEY, -- 'food-001'
-  name VARCHAR(200) NOT NULL,
-  category ENUM('CARBS', 'PROTEIN', 'VEGETABLES', 'FRUITS', 'SNACKS', 'BEVERAGES') NOT NULL,
-  calories_per_100g INT NOT NULL,
-  protein_g_per_100g DECIMAL(5,2) NOT NULL,
-  carbs_g_per_100g DECIMAL(5,2) NOT NULL,
-  fat_g_per_100g DECIMAL(5,2) NOT NULL,
-  fiber_g_per_100g DECIMAL(5,2),
-  estimated_price_idr INT NOT NULL,
-  serving_size_g INT NOT NULL,
-  is_halal BOOLEAN DEFAULT TRUE,
-  is_vegetarian BOOLEAN DEFAULT FALSE,
-  is_vegan BOOLEAN DEFAULT FALSE,
-  is_gluten_free BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_category (category),
-  INDEX idx_price (estimated_price_idr)
-);
-```
-
-### 9.4 Tabel Workout Plans
-
-#### workout_plans
-```sql
-CREATE TABLE workout_plans (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  start_date DATE NOT NULL,
-  end_date DATE NOT NULL,
-  status ENUM('ACTIVE', 'COMPLETED', 'CANCELLED') DEFAULT 'ACTIVE',
-  is_active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  INDEX idx_user_active (user_id, is_active),
-  INDEX idx_status (status)
-);
-```
-
-#### workout_days
-```sql
-CREATE TABLE workout_days (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  workout_plan_id INT NOT NULL,
-  day_index INT NOT NULL, -- 0-6
-  date DATE NOT NULL,
-  is_rest_day BOOLEAN DEFAULT FALSE,
-  estimated_minutes INT,
-  estimated_calories INT,
-  is_completed BOOLEAN DEFAULT FALSE,
-  completed_at TIMESTAMP NULL,
-  FOREIGN KEY (workout_plan_id) REFERENCES workout_plans(id) ON DELETE CASCADE,
-  INDEX idx_plan_day (workout_plan_id, day_index),
-  INDEX idx_date (date)
-);
-```
-
-#### exercises
-```sql
-CREATE TABLE exercises (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  workout_day_id INT NOT NULL,
-  exercise_item_id VARCHAR(50) NOT NULL,
-  order_in_day INT NOT NULL,
-  phase ENUM('WARMUP', 'MAIN', 'COOLDOWN') NOT NULL,
-  sets INT NOT NULL,
-  reps INT NOT NULL,
-  rest_seconds INT NOT NULL,
-  ai_tip TEXT,
-  FOREIGN KEY (workout_day_id) REFERENCES workout_days(id) ON DELETE CASCADE,
-  FOREIGN KEY (exercise_item_id) REFERENCES exercise_master(id),
-  INDEX idx_workout_day (workout_day_id),
-  INDEX idx_order (workout_day_id, order_in_day)
-);
-```
-
-#### workout_sessions
-```sql
-CREATE TABLE workout_sessions (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  workout_day_id INT NOT NULL,
-  status ENUM('IN_PROGRESS', 'COMPLETED', 'CANCELLED') DEFAULT 'IN_PROGRESS',
-  mood INT, -- 1-5
-  energy INT, -- 1-5
-  sleep_band ENUM('<5', '5-6', '6-7', '7-8', '>8'),
-  adjustment_factor DECIMAL(4,2), -- -0.5 to +0.2
-  started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  completed_at TIMESTAMP NULL,
-  duration_minutes INT,
-  total_sets INT,
-  total_reps INT,
-  calories_burned INT,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (workout_day_id) REFERENCES workout_days(id) ON DELETE CASCADE,
-  INDEX idx_user_status (user_id, status),
-  INDEX idx_completed_at (completed_at)
-);
-```
-
-#### exercise_logs
-```sql
-CREATE TABLE exercise_logs (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  workout_session_id INT NOT NULL,
-  exercise_id INT NOT NULL,
-  set_number INT NOT NULL,
-  reps_done INT NOT NULL,
-  rest_seconds_actual INT,
-  logged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (workout_session_id) REFERENCES workout_sessions(id) ON DELETE CASCADE,
-  FOREIGN KEY (exercise_id) REFERENCES exercises(id) ON DELETE CASCADE,
-  INDEX idx_session (workout_session_id),
-  INDEX idx_exercise (exercise_id)
-);
-```
-
-### 9.5 Tabel Meal Plans
-
-#### meal_plans
-```sql
-CREATE TABLE meal_plans (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  start_date DATE NOT NULL,
-  end_date DATE NOT NULL,
-  status ENUM('ACTIVE', 'COMPLETED', 'CANCELLED') DEFAULT 'ACTIVE',
-  is_active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  INDEX idx_user_active (user_id, is_active)
-);
-```
-
-#### meal_days
-```sql
-CREATE TABLE meal_days (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  meal_plan_id INT NOT NULL,
-  day_index INT NOT NULL, -- 0-6
-  date DATE NOT NULL,
-  total_calories INT,
-  total_protein_g DECIMAL(6,2),
-  total_carbs_g DECIMAL(6,2),
-  total_fat_g DECIMAL(6,2),
-  total_cost_idr INT,
-  FOREIGN KEY (meal_plan_id) REFERENCES meal_plans(id) ON DELETE CASCADE,
-  INDEX idx_plan_day (meal_plan_id, day_index),
-  INDEX idx_date (date)
-);
-```
-
-#### meal_times
-```sql
-CREATE TABLE meal_times (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  meal_day_id INT NOT NULL,
-  meal_type ENUM('BREAKFAST', 'LUNCH', 'DINNER', 'SNACK') NOT NULL,
-  order_in_day INT NOT NULL,
-  calories INT,
-  protein_g DECIMAL(6,2),
-  carbs_g DECIMAL(6,2),
-  fat_g DECIMAL(6,2),
-  cost_idr INT,
-  is_logged BOOLEAN DEFAULT FALSE,
-  logged_at TIMESTAMP NULL,
-  FOREIGN KEY (meal_day_id) REFERENCES meal_days(id) ON DELETE CASCADE,
-  INDEX idx_meal_day (meal_day_id),
-  INDEX idx_type (meal_type)
-);
-```
-
-#### food_items
-```sql
-CREATE TABLE food_items (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  meal_time_id INT NOT NULL,
-  food_master_id VARCHAR(50) NOT NULL,
-  servings DECIMAL(4,2) NOT NULL,
-  calories INT NOT NULL,
-  protein_g DECIMAL(6,2) NOT NULL,
-  carbs_g DECIMAL(6,2) NOT NULL,
-  fat_g DECIMAL(6,2) NOT NULL,
-  cost_idr INT NOT NULL,
-  FOREIGN KEY (meal_time_id) REFERENCES meal_times(id) ON DELETE CASCADE,
-  FOREIGN KEY (food_master_id) REFERENCES food_master(id),
-  INDEX idx_meal_time (meal_time_id)
-);
-```
-
-#### meal_logs
-```sql
-CREATE TABLE meal_logs (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  meal_time_id INT NOT NULL,
-  food_item_id INT NOT NULL,
-  logged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (meal_time_id) REFERENCES meal_times(id) ON DELETE CASCADE,
-  FOREIGN KEY (food_item_id) REFERENCES food_items(id) ON DELETE CASCADE,
-  UNIQUE KEY unique_meal_log (user_id, meal_time_id, food_item_id),
-  INDEX idx_user_date (user_id, logged_at)
-);
-```
-
-### 9.6 Tabel Progress & Gamifikasi
-
-#### daily_logs
-```sql
-CREATE TABLE daily_logs (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  date DATE NOT NULL,
-  weight_kg DECIMAL(5,2),
-  calories_consumed INT DEFAULT 0,
-  calories_burned INT DEFAULT 0,
-  water_glasses INT DEFAULT 0,
-  workout_done BOOLEAN DEFAULT FALSE,
-  meals_logged INT DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  UNIQUE KEY unique_user_date (user_id, date),
-  INDEX idx_user_date (user_id, date)
-);
-```
-
-#### streaks
-```sql
-CREATE TABLE streaks (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT UNIQUE NOT NULL,
-  current_streak INT DEFAULT 0,
-  best_streak INT DEFAULT 0,
-  last_activity_date DATE,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-```
-
-#### badges
-```sql
-CREATE TABLE badges (
-  id VARCHAR(50) PRIMARY KEY, -- 'badge-streak-3'
-  name VARCHAR(100) NOT NULL,
-  description TEXT NOT NULL,
-  icon_url VARCHAR(500),
-  category ENUM('STREAK', 'WORKOUT', 'WEIGHT', 'CONSISTENCY', 'SPECIAL') NOT NULL,
-  requirement_type ENUM('STREAK_DAYS', 'WORKOUTS_DONE', 'WEIGHT_LOST_KG', 'WEEKS_ACTIVE') NOT NULL,
-  requirement_value INT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-#### user_badges
-```sql
-CREATE TABLE user_badges (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  badge_id VARCHAR(50) NOT NULL,
-  unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (badge_id) REFERENCES badges(id),
-  UNIQUE KEY unique_user_badge (user_id, badge_id),
-  INDEX idx_user (user_id),
-  INDEX idx_unlocked_at (unlocked_at)
-);
-```
-
-#### notifications
-```sql
-CREATE TABLE notifications (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  type ENUM('WORKOUT_REMINDER', 'MEAL_REMINDER', 'HYDRATION', 'STREAK_MILESTONE', 'BADGE_UNLOCKED', 'REPLAN_DUE') NOT NULL,
-  title VARCHAR(200) NOT NULL,
-  body TEXT NOT NULL,
-  is_read BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  INDEX idx_user_read (user_id, is_read),
-  INDEX idx_created_at (created_at)
-);
-```
-
-### 9.7 Tabel Sync & Idempotency
-
-#### sync_ops_log
-```sql
-CREATE TABLE sync_ops_log (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  operation_uuid VARCHAR(36) UNIQUE NOT NULL,
-  operation_type ENUM('WORKOUT_COMPLETE', 'MEAL_LOG', 'WEIGHT_LOG', 'WATER_LOG') NOT NULL,
-  payload JSON NOT NULL,
-  processed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  INDEX idx_uuid (operation_uuid),
-  INDEX idx_user_type (user_id, operation_type)
-);
-```
-
-### 9.8 Relasi Antar Tabel
-
-```
-users (1) ─── (1) health_profiles
-  │
-  ├─── (1) settings
-  ├─── (1) streaks
-  ├─── (N) refresh_tokens
-  ├─── (N) fcm_tokens
-  ├─── (N) workout_plans ─── (N) workout_days ─── (N) exercises ─── (1) exercise_master
-  │                              │
-  │                              └─── (N) workout_sessions ─── (N) exercise_logs
-  │
-  ├─── (N) meal_plans ─── (N) meal_days ─── (N) meal_times ─── (N) food_items ─── (1) food_master
-  │                                              │
-  │                                              └─── (N) meal_logs
-  │
-  ├─── (N) daily_logs
-  ├─── (N) user_badges ─── (1) badges
-  ├─── (N) notifications
-  └─── (N) sync_ops_log
-```
-
+| Enum | Values |
+|------|--------|
+| Gender | M, F, OTHER |
+| FitnessLevel | BEGINNER, INTERMEDIATE, ADVANCED |
+| Goal | WEIGHT_LOSS, MUSCLE_GAIN, MAINTENANCE, PERFORMANCE |
+| WorkoutMode | HOME, GYM, HYBRID |
+| WorkoutType | STRENGTH, CARDIO, HIIT, FLEXIBILITY, REST |
+| Intensity | LOW, MID, HIGH |
+| MealType | BREAKFAST, LUNCH, DINNER, SNACK |
+| SessionStatus | IN_PROGRESS, COMPLETED, ABANDONED |
+| PlanStatus | ACTIVE, COMPLETED, ARCHIVED, SKIPPED |
+| Theme | LIGHT, DARK, SYSTEM |
+| BadgeCategory | STREAK, MILESTONE, GOAL, SPECIAL |
+| BadgeCriterion | STREAK, WORKOUTS_DONE, WEIGHT_LOST, MEALS_LOGGED, CUSTOM |
 
 ---
 
-## 10. API ENDPOINTS
+## 11. API ENDPOINTS
 
-### 10.1 Authentication
+### Auth (`/api/v1/auth`)
 
-#### POST /api/v1/auth/signup
-**Deskripsi:** Registrasi user baru
+| Method | Path | Auth | Keterangan |
+|--------|------|------|------------|
+| POST | `/register` | public | Register + return accessToken + refreshToken |
+| POST | `/login` | public | Login + update last_login_at |
+| GET | `/me` | JWT | User + healthProfile |
+| POST | `/logout` | JWT | Revoke refreshToken di DB |
+| POST | `/refresh-token` | public | Token rotation (SHA256 hash, revoke lama) |
+| POST | `/forgot-password` | public | Dev: return token; prod: kirim email |
+| POST | `/reset-password` | public | (stub 501 untuk demo) |
 
-**Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "SecurePass123!",
-  "name": "John Doe"
-}
-```
+### User (`/api/v1/user`) — semua require JWT
 
-**Response 201:**
-```json
-{
-  "user": {
-    "id": 42,
-    "email": "user@example.com",
-    "name": "John Doe",
-    "avatarUrl": null
-  },
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
+| Method | Path | Keterangan |
+|--------|------|------------|
+| GET | `/profile` | User + healthProfile |
+| PUT | `/profile` | Update name / avatarUrl |
+| PATCH | `/profile/avatar` | Update avatarUrl |
+| POST | `/health-profile` | Buat profil (trigger sebelum generate plan) |
+| PUT | `/health-profile` | Update partial |
+| GET | `/health-metrics` | BMI/weight saat ini |
+| POST | `/health-metrics` | Log berat baru → update DB + daily_logs |
+| GET | `/health-metrics/history` | 30 hari terakhir dari daily_logs |
+| DELETE | `/account` | Soft delete |
 
-**Error 400:**
-```json
-{
-  "error": "VALIDATION_ERROR",
-  "message": "Email sudah terdaftar"
-}
-```
+### Plan (`/api/v1/plan`) — semua require JWT
 
----
+| Method | Path | Keterangan |
+|--------|------|------------|
+| POST | `/generate` | Baca profil → ML workout+meal → persist DB → return |
+| GET | `/active` | Ambil plan aktif (workout + meal) |
+| GET | `/history` | 20 plan terakhir |
+| GET | `/:planId` | Detail plan dengan nested days |
+| POST | `/replan` | 7-day metrics → ML → Gemini narrative → optional generate baru |
+| POST | `/replan/skip` | User lewati replan |
 
-#### POST /api/v1/auth/login
-**Deskripsi:** Login user
+### Workout (`/api/v1/workout`) — semua require JWT
 
-**Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "SecurePass123!"
-}
-```
+| Method | Path | Keterangan |
+|--------|------|------------|
+| GET | `/today` | Workout hari ini |
+| GET | `/day/:dayId` | Detail day + exercises |
+| GET | `/exercise/:exerciseId` | Detail exercise + master (video/tips) |
+| POST | `/:dayId/check-in` | Buat sesi, hitung intensity multiplier |
+| PATCH | `/session/:sessionId/exercise` | Log satu set (reps/weight/duration) |
+| POST | `/session/:sessionId/pause` | Catat pause di notes |
+| POST | `/session/:sessionId/complete` | Selesai → stats + Gemini motivasi + badge |
+| GET | `/session/:sessionId` | Detail sesi |
+| GET | `/sessions` | History sesi (limit query param) |
+| POST | `/exercise/:exerciseId/swap` | Ganti exercise |
 
-**Response 200:**
-```json
-{
-  "user": {
-    "id": 42,
-    "email": "user@example.com",
-    "name": "John Doe",
-    "avatarUrl": "https://cdn.heltigo.app/avatars/42.jpg"
-  },
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
+### Meal (`/api/v1/meal`) — semua require JWT
 
-**Error 401:**
-```json
-{
-  "error": "INVALID_CREDENTIALS",
-  "message": "Email atau password salah"
-}
-```
+| Method | Path | Keterangan |
+|--------|------|------------|
+| GET | `/today` | Meal hari ini (meal_day + meal_times + foods) |
+| GET | `/day/:dayId` | Detail meal day |
+| GET | `/:mealId` | Detail satu meal_time |
+| POST | `/:mealId/log` | Catat sudah makan → update daily_logs + badge check |
+| POST | `/:mealId/swap` | ML alternatives → Gemini reason → return top 3 |
+| POST | `/:mealId/replace` | Apply alternatif pilihan user |
+| GET | `/food/:foodId` | Detail food item |
+| GET | `/log` | History log (days query param) |
+| PUT | `/budget` | Update budget harian (min Rp 10.000) |
+| **POST** | **/food-scan** | **Image → Gemini Vision → TF-IDF → XGBoost → Gemini advice** |
 
----
+### Progress (`/api/v1/progress`) — semua require JWT
 
-#### POST /api/v1/auth/refresh
-**Deskripsi:** Refresh access token
+| Method | Path | Keterangan |
+|--------|------|------------|
+| GET | `/daily` | Daily log hari ini (atau ?date=YYYY-MM-DD) |
+| PATCH | `/daily/water` | Update gelas air ({glasses} atau {delta}) |
+| POST | `/daily/mood` | Log mood hari ini |
+| GET | `/weekly` | 7-day aggregate + daily breakdown |
+| GET | `/weekly-review` | Weekly + weight diff + goal context |
+| GET | `/streak` | Current streak + best + active dates |
+| GET | `/badges` | Semua badge + isUnlocked flag |
+| GET | `/badge/:code` | Detail satu badge |
+| GET | `/share-image` | Payload untuk share (URL null, render di FE) |
 
-**Request Body:**
-```json
-{
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
+### Settings (`/api/v1/settings`) — require JWT
 
-**Response 200:**
-```json
-{
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
+| Method | Path | Keterangan |
+|--------|------|------------|
+| GET | `/` | Get settings (auto-create jika belum ada) |
+| PUT | `/` | Update theme / language / reminder times |
 
----
+### Notifications (`/api/v1/notifications`) — require JWT
 
-#### POST /api/v1/auth/logout
-**Deskripsi:** Logout user (invalidate refresh token)
+| Method | Path | Keterangan |
+|--------|------|------------|
+| GET | `/` | List notifikasi (?unreadOnly=true) + unreadCount |
+| PATCH | `/:id/read` | Mark satu notif as read |
+| PATCH | `/read-all` | Mark semua as read |
+| POST | `/fcm-token` | Register FCM token device |
+| DELETE | `/fcm-token` | Hapus FCM token |
 
-**Headers:** `Authorization: Bearer <accessToken>`
+### Sync (`/api/v1/sync`) — require JWT
 
-**Response 200:**
-```json
-{
-  "message": "Logout berhasil"
-}
-```
+| Method | Path | Keterangan |
+|--------|------|------------|
+| POST | `/batch` | Idempotent batch sync dari offline queue |
 
-
-### 10.2 User & Health Profile
-
-#### GET /api/v1/user/profile
-**Deskripsi:** Get user profile
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Response 200:**
-```json
-{
-  "id": 42,
-  "email": "user@example.com",
-  "name": "John Doe",
-  "avatarUrl": "https://cdn.heltigo.app/avatars/42.jpg",
-  "createdAt": "2026-05-01T10:00:00Z"
-}
-```
+**Sync opType yang didukung:** `log_meal`, `update_water`, `log_mood`, `complete_session`, `update_exercise_log`
 
 ---
 
-#### PUT /api/v1/user/profile
-**Deskripsi:** Update user profile
+## 12. FRONTEND MOBILE FLUTTER
 
-**Headers:** `Authorization: Bearer <accessToken>`
+### 12.1 Struktur Layar (Screen Groups)
 
-**Request Body:**
-```json
-{
-  "name": "John Updated",
-  "avatarUrl": "https://cdn.heltigo.app/avatars/42-new.jpg"
-}
-```
+| Group | Files | Keterangan |
+|-------|-------|------------|
+| `splash/` | `splash_screen.dart`, `onboarding_screen.dart` | Boot + 3-slide onboarding |
+| `auth/` | `login_screen.dart`, `register_screen.dart`, `forgot_password_screen.dart` | Auth flow |
+| `setup/` | `setup_basic_info_screen.dart`, `setup_physical_screen.dart`, `setup_bmi_result_screen.dart`, `setup_goal_screen.dart`, `setup_conditions_screen.dart`, `setup_fitness_level_screen.dart`, `setup_preferences_screen.dart` | 7-step onboarding |
+| `home/` | `home_screen.dart` | Dashboard utama |
+| `plan/` | `plan_generating_screen.dart`, `plan_ready_screen.dart` | Generate + preview plan |
+| `workout/` | `workout_list_screen.dart`, `workout_detail_screen.dart`, `exercise_detail_screen.dart`, `pre_workout_checkin_screen.dart`, `active_workout_screen.dart`, `workout_complete_screen.dart`, `workout_session_detail_screen.dart` | Session lifecycle |
+| `meal/` | `meal_list_screen.dart`, `meal_detail_screen.dart`, `meal_log_screen.dart`, `meal_swap_screen.dart`, `food_item_detail_screen.dart`, `budget_settings_screen.dart`, `food_scan_screen.dart` | Meal flow + kamera |
+| `progress/` | `progress_screen.dart`, `weekly_review_screen.dart`, `streak_detail_screen.dart`, `badge_gallery_screen.dart` | Progress + gamifikasi |
+| `replanning/` | `replanning_update_data_screen.dart` | Weekly replan |
+| `notification/` | `notification_list_screen.dart` | Notifikasi |
+| `profile/` | `profile_screen.dart`, `edit_profile_screen.dart`, `health_metrics_screen.dart` | Profil user |
+| `settings/` | `settings_screen.dart` | Theme toggle (SYSTEM/LIGHT/DARK) + preferences |
+| `main/` | `main_scaffold.dart` | Bottom nav wrapper |
+| `error/` | `not_found_screen.dart` | 404 |
 
-**Response 200:**
-```json
-{
-  "id": 42,
-  "email": "user@example.com",
-  "name": "John Updated",
-  "avatarUrl": "https://cdn.heltigo.app/avatars/42-new.jpg"
-}
-```
+### 12.2 State Management
 
----
+- **`ThemeProvider`** — WidgetsBindingObserver, sinkronisasi `AppColors.setBrightness()`, persist ke SharedPreferences
+- **Provider** — state reactive per feature
+- **GetIt** — dependency injection service locator
 
-#### POST /api/v1/user/health-profile
-**Deskripsi:** Create/update health profile
+### 12.3 Adaptive Theme
 
-**Headers:** `Authorization: Bearer <accessToken>`
+- `AppColors` — semua warna surface/text/border sebagai `static Color get` (dievaluasi ulang tiap build)
+- Light mode: background `#F5F7FA`, surface `#FFFFFF`, teal primary `#1D6766`
+- Dark mode: background `#0D0D0D`, surface `#1A1A1A`, teal primary sama
+- Toggle di settings: SISTEM / TERANG / GELAP
+- `AppTextStyles` — semua sebagai `static TextStyle get` (bukan const) agar warna ikut mode
 
-**Request Body:**
-```json
-{
-  "gender": "MALE",
-  "age": 28,
-  "heightCm": 175,
-  "weightKg": 82,
-  "waistCm": 92,
-  "goal": "WEIGHT_LOSS",
-  "targetWeightKg": 75,
-  "fitnessLevel": "INTERMEDIATE",
-  "workoutMode": "GYM",
-  "daysPerWeek": 4,
-  "sessionMinutes": 45,
-  "conditions": ["JOINT_PAIN"],
-  "budgetPerDayIdr": 35000,
-  "mealFrequency": 3,
-  "dietRestrictions": ["halal"]
-}
-```
+### 12.4 Fitur Camera (Food Scan)
 
-**Response 200:**
-```json
-{
-  "id": 1,
-  "userId": 42,
-  "gender": "MALE",
-  "age": 28,
-  "heightCm": 175,
-  "weightKg": 82,
-  "waistCm": 92,
-  "bmi": 26.78,
-  "bmiCategory": "OVERWEIGHT",
-  "bmr": 1850,
-  "tdee": 2590,
-  "bodyFatPercent": 24.5,
-  "goal": "WEIGHT_LOSS",
-  "targetWeightKg": 75,
-  "fitnessLevel": "INTERMEDIATE",
-  "workoutMode": "GYM",
-  "daysPerWeek": 4,
-  "sessionMinutes": 45,
-  "conditions": ["JOINT_PAIN"],
-  "budgetPerDayIdr": 35000,
-  "mealFrequency": 3,
-  "dietRestrictions": ["halal"]
-}
-```
+- `image_picker: ^1.1.2` — ambil dari kamera atau galeri
+- `permission_handler: ^11.3.1` — request CAMERA, READ_MEDIA_IMAGES
+- AndroidManifest: `android.permission.CAMERA`, `READ_MEDIA_IMAGES`, `READ_EXTERNAL_STORAGE` (maxSdk 32)
+- FE compress → base64 → `POST /api/v1/meal/food-scan { imageBase64 }`
 
+### 12.5 Responsivitas
 
-### 10.3 Plan Generation
-
-#### POST /api/v1/plan/generate
-**Deskripsi:** Generate 7-day workout & meal plan
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Request Body:** `{}` (empty, data diambil dari health_profile)
-
-**Response 200:**
-```json
-{
-  "workoutPlan": {
-    "id": 42,
-    "userId": 42,
-    "startDate": "2026-05-19",
-    "endDate": "2026-05-25",
-    "status": "ACTIVE",
-    "days": [
-      {
-        "id": 101,
-        "dayIndex": 0,
-        "date": "2026-05-19",
-        "isRestDay": false,
-        "estimatedMinutes": 45,
-        "estimatedCalories": 320,
-        "exercises": [
-          {
-            "id": 501,
-            "exerciseItemId": "ex-001",
-            "name": "Jumping Jacks",
-            "orderInDay": 1,
-            "phase": "WARMUP",
-            "sets": 1,
-            "reps": 20,
-            "restSeconds": 30,
-            "aiTip": "Lakukan pelan, fokus pada teknik."
-          }
-        ]
-      }
-    ]
-  },
-  "mealPlan": {
-    "id": 43,
-    "userId": 42,
-    "startDate": "2026-05-19",
-    "endDate": "2026-05-25",
-    "status": "ACTIVE",
-    "days": [
-      {
-        "id": 201,
-        "dayIndex": 0,
-        "date": "2026-05-19",
-        "totalCalories": 1850,
-        "totalProteinG": 120,
-        "totalCarbsG": 200,
-        "totalFatG": 55,
-        "totalCostIdr": 34500,
-        "meals": [
-          {
-            "id": 301,
-            "mealType": "BREAKFAST",
-            "orderInDay": 1,
-            "calories": 450,
-            "proteinG": 25,
-            "carbsG": 60,
-            "fatG": 12,
-            "costIdr": 12000,
-            "foods": [
-              {
-                "id": 401,
-                "foodMasterId": "food-001",
-                "name": "Nasi Goreng",
-                "servings": 1.5,
-                "calories": 350,
-                "proteinG": 18,
-                "carbsG": 50,
-                "fatG": 10,
-                "costIdr": 10000
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-**Error 400:**
-```json
-{
-  "error": "HEALTH_PROFILE_NOT_FOUND",
-  "message": "Lengkapi profil kesehatan terlebih dahulu"
-}
-```
-
-
-### 10.4 Workout Execution
-
-#### POST /api/v1/workout/:dayId/check-in
-**Deskripsi:** Pre-workout check-in dengan intensity adjustment
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Request Body:**
-```json
-{
-  "mood": 3,
-  "energy": 4,
-  "sleepBand": "7-8"
-}
-```
-
-**Response 200:**
-```json
-{
-  "sessionId": 1001,
-  "adjustmentFactor": 0.10,
-  "adjustedExercises": [
-    {
-      "id": 501,
-      "name": "Jumping Jacks",
-      "originalSets": 1,
-      "originalReps": 20,
-      "adjustedSets": 1,
-      "adjustedReps": 22,
-      "restSeconds": 30
-    }
-  ],
-  "aiNote": "Energi bagus! Volume dinaikkan 10%."
-}
-```
+- Adaptive font size dan image ratio berdasarkan `constraints.maxHeight` di LayoutBuilder
+- `FittedBox(fit: BoxFit.scaleDown)` untuk teks di tombol/chip agar tidak clipping
+- `GridView childAspectRatio` dikalibrasi per card untuk menghindari overflow
+- `SingleChildScrollView` di halaman konten panjang
 
 ---
 
-#### POST /api/v1/workout/session/:sessionId/complete
-**Deskripsi:** Mark workout session complete
+## 13. SYNC & OFFLINE QUEUE
 
-**Headers:** `Authorization: Bearer <accessToken>`
+### 13.1 Arsitektur
 
-**Request Body:**
-```json
-{
-  "exerciseLogs": [
-    {
-      "exerciseId": 501,
-      "setNumber": 1,
-      "repsDone": 22,
-      "restSecondsActual": 35
-    }
-  ],
-  "durationMinutes": 47,
-  "caloriesBurned": 340
-}
-```
+Heltigo menggunakan pola **optimistic offline queue** sederhana:
 
-**Response 200:**
-```json
-{
-  "sessionId": 1001,
-  "status": "COMPLETED",
-  "totalSets": 12,
-  "totalReps": 180,
-  "durationMinutes": 47,
-  "caloriesBurned": 340,
-  "streakUpdated": true,
-  "newStreak": 5,
-  "badgesUnlocked": ["badge-workout-10"]
-}
-```
+1. **FE enqueue**: Saat offline, simpan operasi dengan UUID ke antrian lokal
+2. **FE drain**: Saat online kembali (`connectivity_plus`), kirim ke `POST /sync/batch`
+3. **BE idempotent**: Backend check `sync_ops_log` — duplikat dikembalikan hasil lama (DUPLICATE), tidak di-execute ulang
+4. **BE dispatch**: Setiap op diteruskan ke service yang sesuai
 
----
+### 13.2 opType yang Didukung
 
-#### GET /api/v1/workout/active-plan
-**Deskripsi:** Get active workout plan
+| opType | Diteruskan ke |
+|--------|--------------|
+| `log_meal` | `mealService.logMeal` |
+| `update_water` | `progressService.updateWater` |
+| `log_mood` | `progressService.logMood` |
+| `complete_session` | `workoutService.completeSession` (include Gemini enrich) |
+| `update_exercise_log` | `workoutService.updateExerciseLog` |
 
-**Headers:** `Authorization: Bearer <accessToken>`
+### 13.3 Format Request
 
-**Response 200:**
-```json
-{
-  "id": 42,
-  "startDate": "2026-05-19",
-  "endDate": "2026-05-25",
-  "days": [...]
-}
-```
-
-
-### 10.5 Meal Logging
-
-#### POST /api/v1/meal/:mealTimeId/log
-**Deskripsi:** Log meal sebagai sudah dimakan (idempotent)
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Request Body:**
-```json
-{
-  "foodItemIds": [401, 402]
-}
-```
-
-**Response 200:**
-```json
-{
-  "mealTimeId": 301,
-  "isLogged": true,
-  "loggedAt": "2026-05-19T07:30:00Z",
-  "caloriesConsumed": 450
-}
-```
-
----
-
-#### POST /api/v1/meal/:mealTimeId/swap
-**Deskripsi:** Minta alternatif meal
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Request Body:** `{}`
-
-**Response 200:**
-```json
-{
-  "mealTimeId": 301,
-  "newFoods": [
-    {
-      "id": 403,
-      "foodMasterId": "food-005",
-      "name": "Bubur Ayam",
-      "servings": 1.0,
-      "calories": 380,
-      "proteinG": 22,
-      "carbsG": 55,
-      "fatG": 8,
-      "costIdr": 11000
-    }
-  ]
-}
-```
-
----
-
-#### GET /api/v1/meal/active-plan
-**Deskripsi:** Get active meal plan
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Response 200:**
-```json
-{
-  "id": 43,
-  "startDate": "2026-05-19",
-  "endDate": "2026-05-25",
-  "days": [...]
-}
-```
-
-### 10.6 Progress Tracking
-
-#### POST /api/v1/progress/weight
-**Deskripsi:** Log berat badan
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Request Body:**
-```json
-{
-  "weightKg": 81.5,
-  "date": "2026-05-19"
-}
-```
-
-**Response 200:**
-```json
-{
-  "date": "2026-05-19",
-  "weightKg": 81.5,
-  "diffFromLastWeek": -0.5,
-  "diffFromTarget": 6.5
-}
-```
-
----
-
-#### POST /api/v1/progress/water
-**Deskripsi:** Increment water intake (idempotent per request)
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Request Body:**
-```json
-{
-  "glasses": 1
-}
-```
-
-**Response 200:**
-```json
-{
-  "date": "2026-05-19",
-  "totalGlasses": 5,
-  "targetGlasses": 8
-}
-```
-
-
-#### GET /api/v1/progress/daily/:date
-**Deskripsi:** Get daily summary
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Response 200:**
-```json
-{
-  "date": "2026-05-19",
-  "weightKg": 81.5,
-  "caloriesConsumed": 1200,
-  "caloriesBurned": 340,
-  "caloriesRemaining": 310,
-  "waterGlasses": 5,
-  "workoutDone": true,
-  "mealsLogged": 2
-}
-```
-
----
-
-#### GET /api/v1/progress/weekly-review
-**Deskripsi:** Get weekly review data
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Response 200:**
-```json
-{
-  "weekStartDate": "2026-05-12",
-  "weekEndDate": "2026-05-18",
-  "score": 75.0,
-  "workoutDoneCount": 3,
-  "workoutTotalCount": 4,
-  "mealLoggedCount": 18,
-  "mealTotalCount": 21,
-  "weightChangeKg": -0.6,
-  "weightTargetChangeKg": -0.5,
-  "mostSkippedExercises": [
-    {
-      "exerciseId": 12,
-      "name": "Squat",
-      "skipCount": 2
-    }
-  ],
-  "insights": [
-    "Latihan paling sering diskip: Squat. Akan diganti otomatis.",
-    "Konsistensi meal logging bagus (85%)."
-  ],
-  "aiRecommendation": "MAINTAIN_SWAP"
-}
-```
-
----
-
-#### GET /api/v1/progress/streak
-**Deskripsi:** Get streak data
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Response 200:**
-```json
-{
-  "currentStreak": 5,
-  "bestStreak": 12,
-  "lastActivityDate": "2026-05-19"
-}
-```
-
----
-
-#### GET /api/v1/progress/badges
-**Deskripsi:** Get user badges
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Response 200:**
-```json
-{
-  "unlockedBadges": [
-    {
-      "id": "badge-streak-3",
-      "name": "Streak 3 Hari",
-      "description": "Aktif 3 hari berturut-turut",
-      "iconUrl": "https://cdn.heltigo.app/badges/streak-3.png",
-      "unlockedAt": "2026-05-17T20:00:00Z"
-    }
-  ],
-  "lockedBadges": [
-    {
-      "id": "badge-streak-7",
-      "name": "Streak 7 Hari",
-      "description": "Aktif 7 hari berturut-turut",
-      "progress": 5,
-      "requirement": 7
-    }
-  ]
-}
-```
-
-
-### 10.7 Replanning
-
-#### POST /api/v1/plan/replan
-**Deskripsi:** Generate new 7-day plan berdasarkan performa minggu lalu
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Request Body:**
-```json
-{
-  "choice": "MODERATE",
-  "previousPlanId": 42,
-  "score": 75.0,
-  "skippedExerciseIds": [12, 15]
-}
-```
-
-**Response 200:**
-```json
-{
-  "workoutPlan": {
-    "id": 44,
-    "startDate": "2026-05-26",
-    "endDate": "2026-06-01",
-    "days": [...]
-  },
-  "mealPlan": {
-    "id": 45,
-    "startDate": "2026-05-26",
-    "endDate": "2026-06-01",
-    "days": [...]
-  },
-  "aiNotes": "Skor minggu ini 75%. Performa stabil. Saya pertahankan struktur, ganti latihan yang sering diskip.",
-  "aiRecommendation": "Fokus pada konsistensi minggu ini!"
-}
-```
-
-### 10.8 Settings
-
-#### GET /api/v1/settings
-**Deskripsi:** Get user settings
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Response 200:**
-```json
-{
-  "workoutReminderEnabled": true,
-  "workoutReminderTime": "18:00",
-  "mealReminderEnabled": true,
-  "hydrationReminderEnabled": true,
-  "hydrationIntervalHours": 2,
-  "themeMode": "SYSTEM",
-  "language": "id"
-}
-```
-
----
-
-#### PUT /api/v1/settings
-**Deskripsi:** Update settings
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Request Body:**
-```json
-{
-  "workoutReminderEnabled": false,
-  "themeMode": "DARK"
-}
-```
-
-**Response 200:**
-```json
-{
-  "workoutReminderEnabled": false,
-  "workoutReminderTime": "18:00",
-  "mealReminderEnabled": true,
-  "hydrationReminderEnabled": true,
-  "hydrationIntervalHours": 2,
-  "themeMode": "DARK",
-  "language": "id"
-}
-```
-
-### 10.9 Sync (Offline-First)
-
-#### POST /api/v1/sync/batch
-**Deskripsi:** Batch upload offline operations
-
-**Headers:** `Authorization: Bearer <accessToken>`
-
-**Request Body:**
 ```json
 {
   "operations": [
-    {
-      "uuid": "550e8400-e29b-41d4-a716-446655440000",
-      "type": "WORKOUT_COMPLETE",
-      "payload": {
-        "sessionId": 1001,
-        "exerciseLogs": [...],
-        "durationMinutes": 47
-      }
-    },
-    {
-      "uuid": "550e8400-e29b-41d4-a716-446655440001",
-      "type": "MEAL_LOG",
-      "payload": {
-        "mealTimeId": 301,
-        "foodItemIds": [401, 402]
-      }
-    }
+    { "opId": "<uuid-v4>", "opType": "log_meal", "payload": { "mealId": "123", "foodItemId": "456" } },
+    { "opId": "<uuid-v4>", "opType": "update_water", "payload": { "delta": 1 } }
   ]
 }
 ```
 
-**Response 200:**
-```json
-{
-  "processed": 2,
-  "failed": 0,
-  "results": [
-    {
-      "uuid": "550e8400-e29b-41d4-a716-446655440000",
-      "status": "SUCCESS"
-    },
-    {
-      "uuid": "550e8400-e29b-41d4-a716-446655440001",
-      "status": "SUCCESS"
-    }
-  ]
-}
-```
+### 13.4 Fitur yang Berfungsi Tanpa Internet (FE Side)
 
+| Fitur | Status |
+|-------|--------|
+| Lihat plan workout & meal (data ter-cache) | ✅ |
+| Active workout timer (local) | ✅ |
+| Kalkulasi BMI/BMR/TDEE (pure Dart) | ✅ |
+| Log exercise set (enqueue sync) | ✅ |
+| Log meal (enqueue sync) | ✅ |
+| Update water (enqueue sync) | ✅ |
+
+| Fitur yang Butuh Online | Status |
+|------------------------|--------|
+| Register / Login | ❌ |
+| Generate plan pertama (butuh ML) | ❌ |
+| Food Scan kamera (butuh Gemini + ML) | ❌ |
+| Meal swap alternatives | ❌ |
+| Weekly replan | ❌ |
 
 ---
 
-## 11. FRONTEND MOBILE (FLUTTER)
+## 14. GAMIFIKASI & MOTIVASI
 
-### 11.1 Struktur 47 Screens
+### 14.1 Streak System
 
-#### A. Splash & Onboarding (3 screens)
-| Screen ID | Nama | Deskripsi |
-|-----------|------|-----------|
-| S-01 | Splash Screen | Logo + loading animation |
-| S-02 | Onboarding 1 | "AI Personal Trainer" |
-| S-03 | Onboarding 2 | "Budget-Aware Meal Planning" |
+- Streak increment: setiap `POST /workout/session/:id/complete` yang sukses
+- Cek consecutive via `workoutService._updateStreak()`: compare `lastActiveDate` dengan yesterday
+- Reset ke 1 jika tidak consecutive
+- Data: `streaks.currentStreak`, `streaks.bestStreak`, `streaks.activeDates` (JSON array tanggal)
 
-#### B. Authentication (2 screens)
-| Screen ID | Nama | Deskripsi |
-|-----------|------|-----------|
-| S-04 | Login | Email + password |
-| S-05 | Signup | Email + password + name |
+### 14.2 Badge System
 
-#### C. Setup Wizard (7 screens)
-| Screen ID | Nama | Deskripsi |
-|-----------|------|-----------|
-| S-06 | Setup Welcome | "Mari kita kenali kamu" |
-| S-07 | Basic Info | Nama, usia, gender |
-| S-08 | Physical Data | Tinggi, berat, lingkar pinggang |
-| S-09 | BMI Result | Kalkulasi BMI, BMR, TDEE |
-| S-10 | Health Goal | Turun/jaga/naikkan berat |
-| S-11 | Workout Preferences | Home/gym, frekuensi, durasi |
-| S-12 | Budget & Diet | Budget harian, meal frequency, pantangan |
+**Kriteria auto-check setelah:** complete workout dan log meal
 
-#### D. Plan Generation (2 screens)
-| Screen ID | Nama | Deskripsi |
-|-----------|------|-----------|
-| S-13 | Generating Plan | Loading animation + progress |
-| S-14 | Plan Ready | Preview 7-day plan + "Mulai Sekarang" |
+| BadgeCriterion | Trigger |
+|---------------|---------|
+| STREAK | currentStreak ≥ criterionValue |
+| WORKOUTS_DONE | total completed sessions ≥ criterionValue |
+| MEALS_LOGGED | total meal logs ≥ criterionValue |
+| WEIGHT_LOST | startWeightKg − currentWeightKg ≥ criterionValue |
 
-#### E. Home & Dashboard (3 screens)
-| Screen ID | Nama | Deskripsi |
-|-----------|------|-----------|
-| S-15 | Home Dashboard | Kalori, hidrasi, streak, workout hari ini |
-| S-16 | Notifications | List notifikasi in-app |
-| S-17 | Profile | Avatar, nama, email, settings |
+Badge unlock → insert `user_badges` → response include `newBadges` array (animasi di FE)
 
-#### F. Workout (8 screens)
-| Screen ID | Nama | Deskripsi |
-|-----------|------|-----------|
-| S-18 | Workout Week View | 7-day calendar dengan status |
-| S-19 | Workout Day Detail | List exercise + estimasi waktu |
-| S-20 | Pre-Workout Check-in | Mood, energi, kualitas tidur |
-| S-21 | Active Workout | Timer, set counter, rest timer |
-| S-22 | Exercise Detail | Video, deskripsi, tips |
-| S-23 | Rest Timer | Countdown + skip button |
-| S-24 | Workout Complete | Summary + badge unlock |
-| S-25 | Workout History | List session sebelumnya |
+### 14.3 Motivasi AI (Gemini)
 
-#### G. Meal (7 screens)
-| Screen ID | Nama | Deskripsi |
-|-----------|------|-----------|
-| S-26 | Meal Week View | 7-day calendar dengan status |
-| S-27 | Meal Day Detail | List meal per waktu makan |
-| S-28 | Meal Time Detail | List food items + nutrisi |
-| S-29 | Food Item Detail | Nutrisi lengkap + similar foods |
-| S-30 | Meal Swap | Alternatif meal |
-| S-31 | Meal Logging | Checklist sudah makan |
-| S-32 | Meal History | Riwayat meal logged |
+Setiap milestone memicu Gemini text yang personal:
+- Selesai workout → pesan selamat + tips recovery
+- Swap meal → penjelasan kenapa alternatif ini cocok untuk goal
+- Weekly replan → rangkuman performa + alasan tindak lanjut
+- Food scan → penilaian keseimbangan gizi + tips konkret
 
-#### H. Progress (8 screens)
-| Screen ID | Nama | Deskripsi |
-|-----------|------|-----------|
-| S-33 | Progress Dashboard | Charts weight, workout compliance |
-| S-34 | Weekly Review Modal | Skor, insights, strategi replan |
-| S-35 | New Plan Ready | Preview plan baru setelah replan |
-| S-36 | Weight History | Line chart 4 minggu |
-| S-37 | Weight Log Form | Input berat badan |
-| S-38 | Streak Detail | Current, best, calendar heatmap |
-| S-39 | Badges Collection | Grid unlocked + locked badges |
-| S-40 | Badge Detail | Deskripsi + progress bar |
+---
 
-#### I. Settings (7 screens)
-| Screen ID | Nama | Deskripsi |
-|-----------|------|-----------|
-| S-41 | Settings Main | List menu settings |
-| S-42 | Notification Settings | Toggle reminder + waktu |
-| S-43 | Theme Settings | Light / Dark / System |
-| S-44 | Language Settings | Bahasa Indonesia / English |
-| S-45 | Edit Profile | Nama, avatar |
-| S-46 | Edit Health Profile | Update tinggi, berat, goal |
-| S-47 | About | Versi app, credits, privacy policy |
+## 15. CARA MENJALANKAN
 
-### 11.2 Navigation Flow
+### 15.1 Prerequisites
 
-```
-Splash (S-01)
-  ↓
-Onboarding (S-02, S-03) [first time only]
-  ↓
-Login/Signup (S-04, S-05)
-  ↓
-Setup Wizard (S-06 → S-12) [first time only]
-  ↓
-Generating Plan (S-13)
-  ↓
-Plan Ready (S-14)
-  ↓
-Home Dashboard (S-15) ← Main entry point
-  ├─ Workout Week (S-18)
-  │   ├─ Workout Day (S-19)
-  │   │   ├─ Pre-Workout Check-in (S-20)
-  │   │   │   └─ Active Workout (S-21)
-  │   │   │       ├─ Exercise Detail (S-22)
-  │   │   │       ├─ Rest Timer (S-23)
-  │   │   │       └─ Workout Complete (S-24)
-  │   │   └─ Workout History (S-25)
-  │   └─ ...
-  ├─ Meal Week (S-26)
-  │   ├─ Meal Day (S-27)
-  │   │   ├─ Meal Time (S-28)
-  │   │   │   ├─ Food Item (S-29)
-  │   │   │   ├─ Meal Swap (S-30)
-  │   │   │   └─ Meal Logging (S-31)
-  │   │   └─ Meal History (S-32)
-  │   └─ ...
-  ├─ Progress (S-33)
-  │   ├─ Weekly Review (S-34) → New Plan Ready (S-35)
-  │   ├─ Weight History (S-36) → Weight Log (S-37)
-  │   ├─ Streak Detail (S-38)
-  │   └─ Badges (S-39) → Badge Detail (S-40)
-  ├─ Profile (S-17)
-  │   └─ Settings (S-41)
-  │       ├─ Notification Settings (S-42)
-  │       ├─ Theme Settings (S-43)
-  │       ├─ Language Settings (S-44)
-  │       ├─ Edit Profile (S-45)
-  │       ├─ Edit Health Profile (S-46)
-  │       └─ About (S-47)
-  └─ Notifications (S-16)
+- Node.js 20+, npm
+- Python 3.11+, pip
+- MySQL 8.0 (XAMPP/standalone)
+- Flutter SDK 3.x (Dart 3.10+)
+- Android Studio / Android emulator (API 21+)
+
+### 15.2 Setup ML Service
+
+```powershell
+cd machine-learning\ml-service
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+# Buat .env (dari .env.example)
+# Isi ML_SERVICE_KEY dan GEMINI_API_KEY (dari aistudio.google.com/apikey)
 ```
 
-### 11.3 State Management Pattern
+### 15.3 Setup Backend
 
-**Provider + GetIt:**
-```dart
-// Service locator (GetIt)
-final getIt = GetIt.instance;
+```powershell
+cd backend
+npm install    # termasuk @google/generative-ai
 
-void setupDependencies() {
-  getIt.registerLazySingleton<ApiClient>(() => ApiClient());
-  getIt.registerLazySingleton<AuthService>(() => AuthService(getIt<ApiClient>()));
-  getIt.registerLazySingleton<PlanService>(() => PlanService(getIt<ApiClient>()));
-  // ...
-}
+# Buat .env dari .env.example:
+# DATABASE_URL=mysql://root:@localhost:3306/heltigo
+# JWT_SECRET=<min 32 char>
+# ML_SERVICE_URL=http://localhost:8001
+# ML_SERVICE_KEY=<sama dengan ml-service>
+# GEMINI_API_KEY=<sama atau terpisah>
 
-// Provider (state management)
-class WorkoutProvider extends ChangeNotifier {
-  final PlanService _planService = getIt<PlanService>();
-  WorkoutPlan? _activePlan;
-  bool _isLoading = false;
-
-  WorkoutPlan? get activePlan => _activePlan;
-  bool get isLoading => _isLoading;
-
-  Future<void> fetchActivePlan() async {
-    _isLoading = true;
-    notifyListeners();
-    
-    _activePlan = await _planService.getActiveWorkoutPlan();
-    
-    _isLoading = false;
-    notifyListeners();
-  }
-}
-
-// Usage in widget
-class WorkoutWeekScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<WorkoutProvider>(
-      builder: (context, provider, child) {
-        if (provider.isLoading) return LoadingIndicator();
-        return WorkoutWeekView(plan: provider.activePlan);
-      },
-    );
-  }
-}
+npx prisma migrate dev    # buat semua 19 tabel
 ```
 
+### 15.4 Menjalankan (3 terminal)
 
-### 11.4 Offline-First Implementation
+```powershell
+# Terminal 1 — ML Service (port 8001)
+cd machine-learning\ml-service
+.\.venv\Scripts\Activate.ps1
+uvicorn main:app --reload --port 8001
 
-**Connectivity Detection:**
-```dart
-class ConnectivityService {
-  final Connectivity _connectivity = Connectivity();
-  final StreamController<bool> _connectionStatusController = StreamController<bool>.broadcast();
+# Terminal 2 — Backend (port 3000)
+cd backend
+npm run dev
 
-  Stream<bool> get connectionStatus => _connectionStatusController.stream;
-  bool _isOnline = true;
-
-  ConnectivityService() {
-    _connectivity.onConnectivityChanged.listen((result) {
-      _isOnline = result != ConnectivityResult.none;
-      _connectionStatusController.add(_isOnline);
-    });
-  }
-
-  bool get isOnline => _isOnline;
-}
+# Terminal 3 — Flutter (emulator/device)
+cd frontend\heltigo
+flutter run
 ```
 
-**Sync Queue:**
-```dart
-class SyncQueue {
-  final Hive _hive;
-  final ApiClient _apiClient;
-  final ConnectivityService _connectivity;
+### 15.5 Sanity Check
 
-  Future<void> enqueue(SyncOperation operation) async {
-    final box = await _hive.openBox<SyncOperation>('sync_queue');
-    await box.add(operation);
-    
-    if (_connectivity.isOnline) {
-      await drain();
-    }
-  }
+```powershell
+# Health check
+curl http://localhost:8001/health    # ML: { "status": "ok", "models": {...} }
+curl http://localhost:3000/health    # BE: { "status": "ok" }
 
-  Future<void> drain() async {
-    final box = await _hive.openBox<SyncOperation>('sync_queue');
-    final operations = box.values.toList();
-    
-    if (operations.isEmpty) return;
-
-    try {
-      final response = await _apiClient.post('/sync/batch', {
-        'operations': operations.map((op) => op.toJson()).toList(),
-      });
-      
-      // Clear processed operations
-      await box.clear();
-    } catch (e) {
-      // Retry later
-    }
-  }
-}
+# Test auth
+curl -X POST http://localhost:3000/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@test.com","password":"testpass123","name":"Test"}'
 ```
 
-**Cache Strategy:**
-```dart
-class CacheService {
-  final SharedPreferences _prefs;
+### 15.6 Environment Variables Lengkap
 
-  Future<void> cacheWorkoutPlan(WorkoutPlan plan) async {
-    await _prefs.setString('active_workout_plan', jsonEncode(plan.toJson()));
-  }
+**backend/.env:**
+```ini
+NODE_ENV=development
+PORT=3000
+DATABASE_URL=mysql://root:@localhost:3306/heltigo
+JWT_SECRET=supersecretjwtkey_minimum_32_chars_long
+JWT_ACCESS_EXPIRES=900s
+JWT_REFRESH_EXPIRES=604800s
+BCRYPT_ROUNDS=12
+ML_SERVICE_URL=http://localhost:8001
+ML_SERVICE_KEY=shared-secret-with-fastapi
+GEMINI_API_KEY=                    # dari aistudio.google.com/apikey
+GEMINI_MODEL=gemini-1.5-flash
+GEMINI_TIMEOUT_MS=3000
+CORS_ORIGINS=http://localhost:*,http://10.0.2.2:*
+LOG_LEVEL=debug
+```
 
-  WorkoutPlan? getCachedWorkoutPlan() {
-    final json = _prefs.getString('active_workout_plan');
-    if (json == null) return null;
-    return WorkoutPlan.fromJson(jsonDecode(json));
-  }
-}
+**machine-learning/ml-service/.env:**
+```ini
+ML_SERVICE_KEY=shared-secret-with-fastapi
+GEMINI_API_KEY=                    # untuk Gemini Vision di food-scan
+PORT=8001
 ```
 
 ---
 
-## 12. OFFLINE-FIRST STRATEGY
-
-### 12.1 Fitur Offline vs Online
-
-| Fitur | Offline | Online | Fallback Strategy |
-|-------|---------|--------|-------------------|
-| **Lihat workout plan** | ✅ Cache | ✅ Fresh | Cache jika API gagal |
-| **Lihat meal plan** | ✅ Cache | ✅ Fresh | Cache jika API gagal |
-| **Centang exercise selesai** | ✅ Enqueue | ✅ Langsung | Enqueue untuk sync |
-| **Centang meal selesai** | ✅ Enqueue | ✅ Langsung | Enqueue untuk sync |
-| **Active workout tracking** | ✅ Lokal | ✅ Lokal | Timer lokal, sync setelah selesai |
-| **Log berat badan** | ✅ Enqueue | ✅ Langsung | Enqueue untuk sync |
-| **Log air minum** | ✅ Lokal | ✅ Langsung | Increment lokal, sync batch |
-| **Pre-workout check-in** | ❌ | ✅ ML adjust | Gunakan original plan tanpa adjust |
-| **Meal swap** | ❌ | ✅ ML replan | Tampilkan pesan "Butuh koneksi" |
-| **Generate plan pertama** | ❌ | ✅ ML | Tidak bisa offline |
-| **Weekly review** | ⚠️ Cache | ✅ Fresh | Tampilkan cached data + warning |
-| **Replan** | ❌ | ✅ ML | Tidak bisa offline |
-| **Signup/Login** | ❌ | ✅ Auth | Tidak bisa offline |
-
-
-### 12.2 Sync Queue Architecture
-
-**Operation Types:**
-```dart
-enum SyncOperationType {
-  WORKOUT_COMPLETE,
-  MEAL_LOG,
-  WEIGHT_LOG,
-  WATER_LOG,
-}
-
-class SyncOperation {
-  final String uuid; // UUID v4
-  final SyncOperationType type;
-  final Map<String, dynamic> payload;
-  final DateTime createdAt;
-
-  SyncOperation({
-    required this.uuid,
-    required this.type,
-    required this.payload,
-    required this.createdAt,
-  });
-}
-```
-
-**Enqueue Example:**
-```dart
-// User centang workout selesai saat offline
-await syncQueue.enqueue(SyncOperation(
-  uuid: Uuid().v4(),
-  type: SyncOperationType.WORKOUT_COMPLETE,
-  payload: {
-    'sessionId': 1001,
-    'exerciseLogs': [...],
-    'durationMinutes': 47,
-  },
-  createdAt: DateTime.now(),
-));
-```
-
-**Drain on Reconnect:**
-```dart
-// Listener connectivity
-_connectivity.connectionStatus.listen((isOnline) {
-  if (isOnline) {
-    syncQueue.drain(); // Batch upload semua pending operations
-  }
-});
-```
-
-### 12.3 Conflict Resolution
-
-**Idempotency Key:**
-- Setiap operation punya UUID unik
-- Backend track di `sync_ops_log` table
-- Jika UUID sudah ada, skip (tidak error)
-
-**Last-Write-Wins:**
-- Weight log: timestamp terbaru menang
-- Meal log: idempotent per (user_id, meal_time_id, food_item_id)
-- Workout session: tidak bisa conflict (sessionId unik)
-
-**No Conflict:**
-- Workout complete: sessionId unik, tidak bisa conflict
-- Water log: increment-only, tidak bisa conflict
-
-### 12.4 Cache Invalidation
-
-**TTL Strategy:**
-- Workout plan: Cache 7 hari (sampai plan expired)
-- Meal plan: Cache 7 hari
-- Daily log: Cache 1 hari (reset tiap midnight)
-- Weekly review: Cache 1 minggu
-
-**Manual Invalidation:**
-- Saat replan: Clear old plan cache
-- Saat logout: Clear semua cache
-- Saat sync success: Update cache dengan server response
-
----
-
-## 13. GAMIFIKASI & MOTIVASI
-
-### 13.1 Streak System
-
-**Definisi Streak:**
-- User dianggap "aktif" jika:
-  - Menyelesaikan minimal 1 workout ATAU
-  - Log minimal 2 meals
-- Streak bertambah jika aktif hari ini DAN kemarin
-- Streak reset jika tidak aktif 2 hari berturut-turut
-
-**Streak Calculation:**
-```typescript
-function updateStreak(userId: number, today: Date): Promise<void> {
-  const yesterday = subDays(today, 1);
-  const todayLog = await getDailyLog(userId, today);
-  const yesterdayLog = await getDailyLog(userId, yesterday);
-
-  const isActiveToday = todayLog.workoutDone || todayLog.mealsLogged >= 2;
-  const wasActiveYesterday = yesterdayLog?.workoutDone || yesterdayLog?.mealsLogged >= 2;
-
-  if (isActiveToday && wasActiveYesterday) {
-    await incrementStreak(userId);
-  } else if (isActiveToday && !wasActiveYesterday) {
-    await resetStreak(userId, 1); // Start new streak
-  }
-}
-```
-
-**Streak Milestones:**
-- 🔥 3 hari → Badge "Streak 3"
-- 🔥 7 hari → Badge "Streak 7" + notifikasi motivasi
-- 🔥 30 hari → Badge "Streak 30" + special reward
-- 🔥 100 hari → Badge "Streak 100" + hall of fame
-
-
-### 13.2 Badge System (15 Badges)
-
-#### A. Streak Badges (4)
-| Badge ID | Nama | Requirement | Icon |
-|----------|------|-------------|------|
-| badge-streak-3 | Streak 3 Hari | Current streak ≥ 3 | 🔥 |
-| badge-streak-7 | Streak 7 Hari | Current streak ≥ 7 | 🔥🔥 |
-| badge-streak-30 | Streak 30 Hari | Current streak ≥ 30 | 🔥🔥🔥 |
-| badge-streak-100 | Streak 100 Hari | Current streak ≥ 100 | 🏆 |
-
-#### B. Workout Badges (4)
-| Badge ID | Nama | Requirement | Icon |
-|----------|------|-------------|------|
-| badge-workout-10 | 10 Workouts | Total workouts ≥ 10 | 💪 |
-| badge-workout-50 | 50 Workouts | Total workouts ≥ 50 | 💪💪 |
-| badge-workout-100 | 100 Workouts | Total workouts ≥ 100 | 💪💪💪 |
-| badge-workout-perfect-week | Perfect Week | 7/7 workouts dalam 1 minggu | ⭐ |
-
-#### C. Weight Loss Badges (3)
-| Badge ID | Nama | Requirement | Icon |
-|----------|------|-------------|------|
-| badge-weight-1kg | Turun 1 kg | Weight lost ≥ 1 kg | 📉 |
-| badge-weight-5kg | Turun 5 kg | Weight lost ≥ 5 kg | 📉📉 |
-| badge-weight-10kg | Turun 10 kg | Weight lost ≥ 10 kg | 🎯 |
-
-#### D. Consistency Badges (3)
-| Badge ID | Nama | Requirement | Icon |
-|----------|------|-------------|------|
-| badge-meal-logger | Meal Logger | Log meals 21/21 dalam 1 minggu | 🍽️ |
-| badge-early-bird | Early Bird | Workout sebelum 08:00 sebanyak 5× | 🌅 |
-| badge-night-owl | Night Owl | Workout setelah 20:00 sebanyak 5× | 🌙 |
-
-#### E. Special Badge (1)
-| Badge ID | Nama | Requirement | Icon |
-|----------|------|-------------|------|
-| badge-first-plan | First Plan | Selesaikan setup & generate plan pertama | 🎉 |
-
-### 13.3 Weekly Review Insights
-
-**AI-Generated Insights:**
-```typescript
-function generateInsights(weeklyData: WeeklyData): string[] {
-  const insights: string[] = [];
-
-  // Workout compliance
-  const workoutRate = weeklyData.workoutDoneCount / weeklyData.workoutTotalCount;
-  if (workoutRate >= 0.85) {
-    insights.push("🎉 Konsistensi latihan luar biasa! Kamu menyelesaikan 85%+ workout.");
-  } else if (workoutRate < 0.5) {
-    insights.push("⚠️ Konsistensi latihan perlu ditingkatkan. Coba kurangi intensitas minggu depan.");
-  }
-
-  // Meal logging
-  const mealRate = weeklyData.mealLoggedCount / weeklyData.mealTotalCount;
-  if (mealRate >= 0.8) {
-    insights.push("✅ Meal logging bagus (80%+). Ini membantu tracking kalori akurat.");
-  }
-
-  // Weight progress
-  const weightDiff = weeklyData.weightChangeKg;
-  const targetDiff = weeklyData.weightTargetChangeKg;
-  if (Math.abs(weightDiff - targetDiff) < 0.2) {
-    insights.push("🎯 Progres berat badan sesuai target! Pertahankan pola ini.");
-  } else if (weightDiff < targetDiff - 0.3) {
-    insights.push("📈 Berat turun lebih lambat dari target. Coba kurangi kalori atau tambah intensitas.");
-  }
-
-  // Most skipped exercise
-  if (weeklyData.mostSkippedExercises.length > 0) {
-    const ex = weeklyData.mostSkippedExercises[0];
-    insights.push(`🔄 Latihan paling sering diskip: ${ex.name}. Akan diganti otomatis minggu depan.`);
-  }
-
-  return insights;
-}
-```
-
-**Motivasi Personal:**
-```typescript
-function generateMotivation(score: number): string {
-  if (score >= 80) {
-    return "Performamu luar biasa minggu ini! Kamu adalah contoh konsistensi. 🔥";
-  } else if (score >= 60) {
-    return "Progres bagus! Sedikit lagi untuk mencapai performa optimal. 💪";
-  } else if (score >= 40) {
-    return "Minggu ini cukup menantang, tapi kamu tetap berusaha. Ayo bangkit minggu depan! 🌟";
-  } else {
-    return "Tidak apa-apa, semua orang punya minggu yang sulit. Yang penting kamu tidak menyerah. 💙";
-  }
-}
-```
-
-
-### 13.4 Notification Strategy
-
-**Timing & Frequency:**
-| Notification Type | Default Time | Frequency | Customizable |
-|-------------------|--------------|-----------|--------------|
-| Workout Reminder | 18:00 | Daily (jika ada workout) | ✅ |
-| Pre-Reminder | 17:45 | 15 min before workout | ❌ |
-| Meal Reminder | 07:00, 12:00, 19:00 | Per meal time | ✅ |
-| Hydration | Every 2 hours | 08:00-20:00 | ✅ Interval |
-| Streak Milestone | 20:00 | On milestone | ❌ |
-| Badge Unlocked | Immediately | On unlock | ❌ |
-| Replan Due | Sunday 20:00 | Weekly | ❌ |
-
-**Smart Notification:**
-- Tidak kirim workout reminder jika sudah selesai workout hari ini
-- Tidak kirim meal reminder jika sudah log meal tersebut
-- Tidak kirim hydration reminder jika sudah 8/8 gelas
-- Batch notification jika user tidak buka app >24 jam
-
----
-
-## 14. TIMELINE IMPLEMENTASI
-
-### 14.1 Sprint 1: Foundation (Minggu 1-2)
-
-#### Week 1: Backend + ML Setup
-**Backend (3 hari):**
-- ✅ Setup Express.js + TypeScript + Prisma
-- ✅ Database schema (19 tables)
-- ✅ Auth endpoints (signup, login, refresh, logout)
-- ✅ User & health profile endpoints
-- ✅ Seed exercise_master (200 items) & food_master (1,346 items)
-
-**ML Service (3 hari):**
-- ✅ Setup FastAPI + scikit-learn
-- ✅ Train Workout Recommender (Random Forest)
-- ✅ Implement Meal Planner (Knapsack)
-- ✅ Implement Intensity Adjuster (Rule-based)
-- ✅ Implement Replanner (Rule-based)
-- ✅ API endpoints: /predict/workout-plan, /predict/meal-plan, /predict/replan
-
-**Testing (1 hari):**
-- ✅ Unit tests backend (Jest)
-- ✅ Unit tests ML (pytest)
-- ✅ Integration test: Backend ↔ ML
-
-#### Week 2: Frontend Foundation
-**Setup (1 hari):**
-- ✅ Flutter project setup
-- ✅ Folder structure (47 screens)
-- ✅ Theme (colors, text styles, sizes)
-- ✅ Router (GoRouter)
-- ✅ State management (Provider + GetIt)
-
-**Screens (4 hari):**
-- ✅ Splash & Onboarding (S-01 to S-03)
-- ✅ Auth (S-04, S-05)
-- ✅ Setup Wizard (S-06 to S-12)
-- ✅ Plan Generation (S-13, S-14)
-- ✅ Home Dashboard (S-15)
-
-**Testing (2 hari):**
-- ✅ Widget tests (setup wizard flow)
-- ✅ Integration test (signup → setup → plan generation)
-
-### 14.2 Sprint 2: Core Features (Minggu 3-4)
-
-#### Week 3: Workout Features
-**Backend (2 hari):**
-- ✅ Workout endpoints (active-plan, check-in, session complete)
-- ✅ Exercise log tracking
-- ✅ Streak calculation logic
-
-**Frontend (3 hari):**
-- ✅ Workout Week View (S-18)
-- ✅ Workout Day Detail (S-19)
-- ✅ Pre-Workout Check-in (S-20)
-- ✅ Active Workout (S-21)
-- ✅ Exercise Detail (S-22)
-- ✅ Rest Timer (S-23)
-- ✅ Workout Complete (S-24)
-
-**Testing (2 hari):**
-- ✅ E2E test: Pre-workout check-in → Active workout → Complete
-- ✅ Timer accuracy test
-
-#### Week 4: Meal Features
-**Backend (2 hari):**
-- ✅ Meal endpoints (active-plan, log, swap)
-- ✅ Meal logging idempotency
-
-**Frontend (3 hari):**
-- ✅ Meal Week View (S-26)
-- ✅ Meal Day Detail (S-27)
-- ✅ Meal Time Detail (S-28)
-- ✅ Food Item Detail (S-29)
-- ✅ Meal Swap (S-30)
-- ✅ Meal Logging (S-31)
-
-**Testing (2 hari):**
-- ✅ E2E test: Meal swap → Log meal
-- ✅ Idempotency test (double log)
-
-
-### 14.3 Sprint 3: Progress & Gamification (Minggu 5-6)
-
-#### Week 5: Progress Tracking
-**Backend (2 hari):**
-- ✅ Progress endpoints (daily, weekly-review, weight, water)
-- ✅ Badge system (15 badges)
-- ✅ Badge unlock logic
-
-**Frontend (3 hari):**
-- ✅ Progress Dashboard (S-33)
-- ✅ Weight History (S-36)
-- ✅ Weight Log Form (S-37)
-- ✅ Streak Detail (S-38)
-- ✅ Badges Collection (S-39)
-- ✅ Badge Detail (S-40)
-
-**Testing (2 hari):**
-- ✅ Badge unlock test (streak, workout, weight)
-- ✅ Weight chart rendering test
-
-#### Week 6: Replanning & Notifications
-**Backend (2 hari):**
-- ✅ Replan endpoint
-- ✅ Weekly review aggregation
-- ✅ Notification scheduling (cron jobs)
-
-**Frontend (3 hari):**
-- ✅ Weekly Review Modal (S-34)
-- ✅ New Plan Ready (S-35)
-- ✅ Notifications Screen (S-16)
-- ✅ Local notifications setup
-
-**Testing (2 hari):**
-- ✅ Replan strategy test (REDUCE, MAINTAIN, INTENSIFY)
-- ✅ Notification delivery test
-
-### 14.4 Sprint 4: Offline & Polish (Minggu 7-8)
-
-#### Week 7: Offline-First
-**Backend (1 hari):**
-- ✅ Sync batch endpoint
-- ✅ Idempotency tracking (sync_ops_log)
-
-**Frontend (4 hari):**
-- ✅ Connectivity detection
-- ✅ Sync queue implementation
-- ✅ Cache strategy (Shared Preferences)
-- ✅ Offline indicator UI
-- ✅ Drain queue on reconnect
-
-**Testing (2 hari):**
-- ✅ Offline mode test (workout, meal, weight log)
-- ✅ Sync queue drain test
-- ✅ Conflict resolution test
-
-#### Week 8: Polish & Deployment
-**Frontend (3 hari):**
-- ✅ Settings screens (S-41 to S-47)
-- ✅ Profile edit (S-45, S-46)
-- ✅ Theme switcher (S-43)
-- ✅ Language switcher (S-44)
-- ✅ UI polish (animations, transitions)
-- ✅ Accessibility (semantic labels, contrast)
-
-**Backend (1 hari):**
-- ✅ Rate limiting (Redis)
-- ✅ Error logging (Pino)
-- ✅ Health check endpoints
-
-**Deployment (2 hari):**
-- ✅ Deploy backend ke Render
-- ✅ Deploy ML service ke Render (Docker)
-- ✅ Setup MySQL (PlanetScale)
-- ✅ Setup Redis (Upstash)
-- ✅ CI/CD (GitHub Actions)
-
-**Final Testing (1 hari):**
-- ✅ E2E test full flow (signup → setup → workout → meal → replan)
-- ✅ Performance test (API latency, ML inference)
-- ✅ Security audit (JWT, password hashing, SQL injection)
-
-### 14.5 Post-Launch (Minggu 9+)
-
-**Phase 1: Monitoring (Minggu 9-10)**
-- Setup Sentry untuk error tracking
-- Setup Uptime Robot untuk uptime monitoring
-- Collect user feedback (in-app survey)
-- Fix critical bugs
-
-**Phase 2: Iteration (Minggu 11-12)**
-- Improve ML model accuracy (retrain dengan user data)
-- Add more exercises (300+ items)
-- Add more foods (2,000+ items)
-- Optimize API performance (caching, query optimization)
-
-**Phase 3: New Features (Minggu 13+)**
-- Social features (leaderboard, challenges)
-- Wearable integration (optional)
-- Export data (PDF report)
-- Premium features (personal coach chat, custom meal plan)
-
----
-
-## PENUTUP
-
-### Ringkasan Keunggulan Heltigo
-
-1. **AI-Powered Personalization** - 4 model AI yang bekerja sama untuk program yang benar-benar personal
-2. **Budget-Aware** - Meal planning dengan constraint optimization, terjangkau untuk semua kalangan
-3. **Adaptive Real-Time** - Intensity adjustment berdasarkan kondisi psikologis, bukan hanya fisiologis
-4. **Offline-First** - Fitur kritis tetap berfungsi tanpa internet, cocok untuk Indonesia
-5. **Gamified** - Streak, badge, weekly review untuk meningkatkan konsistensi jangka panjang
-6. **No Wearable** - Hanya butuh smartphone, tidak butuh smartwatch mahal
-7. **Local Context** - Database makanan Indonesia, bahasa Indonesia, halal-aware
-
-### Target Kompetisi MSU iREX 2026
-
-Heltigo memenuhi kriteria kompetisi:
-- ✅ **Innovation:** Hybrid ML approach (RF + Knapsack + Rule-based)
-- ✅ **Social Impact:** Mengatasi obesitas & PTM dengan solusi terjangkau
-- ✅ **Technical Excellence:** Microservice architecture, offline-first, property-based testing
-- ✅ **Scalability:** Dapat melayani 100 juta+ pengguna Indonesia
-- ✅ **Sustainability:** Model bisnis freemium, dapat berkembang jangka panjang
-
-### Kontak Tim
-
-**Tim Hackathon Core3D**
-- Email: team@heltigo.app
-- GitHub: github.com/heltigo
-- Website: heltigo.app
-
----
-
-**Dokumen ini dibuat pada 15 Mei 2026 untuk kompetisi MSU iREX 2026.**
-
-**Versi:** 1.0.0  
-**Total Halaman:** ~50 halaman  
-**Total Kata:** ~15,000 kata
+*Dokumentasi ini mencerminkan state sistem pada 17 Mei 2026 sesuai implementasi aktual. Dibuat untuk keperluan MSU iREX 2026 — Hackathon Core3D.*

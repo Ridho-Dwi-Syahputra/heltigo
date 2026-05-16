@@ -11,6 +11,9 @@ const envSchema = z.object({
   BCRYPT_ROUNDS: z.string().default('12'),
   ML_SERVICE_URL: z.string(),
   ML_SERVICE_KEY: z.string(),
+  GEMINI_API_KEY: z.string().default(''),
+  GEMINI_MODEL: z.string().default('gemini-1.5-flash'),
+  GEMINI_TIMEOUT_MS: z.string().default('3000'),
   CORS_ORIGINS: z.string().default('*'),
   LOG_LEVEL: z.string().default('debug'),
 });

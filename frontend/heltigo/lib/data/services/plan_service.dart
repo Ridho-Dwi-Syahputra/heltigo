@@ -1,5 +1,9 @@
-/// Plan Service — komunikasi API untuk plan generation & management
-/// Sumber: docs/frontend/08_API_INTEGRATION.md
+/// Plan Service — komunikasi API untuk plan generation & management.
+/// Backend response shape:
+///   POST /plan/generate  →  { status, data: { workoutPlan, mealPlan } }
+///   GET  /plan/active    →  { workoutPlan, mealPlan }
+///   GET  /plan/history   →  { plans: [...] }
+///   POST /plan/replan    →  { status, data: { summary, ml, narrative, regeneratedPlan } }
 import 'package:heltigo/data/api/api_service.dart';
 import 'package:heltigo/data/api/endpoints.dart';
 
@@ -8,27 +12,46 @@ class PlanService {
 
   PlanService(this._apiService);
 
-  /// POST /plan/generate — generate rencana baru dari ML
-  Future<Map<String, dynamic>> generatePlan() async {
-    final response = await _apiService.post(ApiEndpoints.generatePlan);
-    return response.data as Map<String, dynamic>;
+  Future<Map<String, dynamic>> generatePlan({
+    bool workoutOnly = false,
+    bool mealOnly = false,
+  }) async {
+    final res = await _apiService.post(
+      ApiEndpoints.generatePlan,
+      data: {
+        if (workoutOnly) 'workoutOnly': true,
+        if (mealOnly) 'mealOnly': true,
+      },
+    );
+    return res.data as Map<String, dynamic>;
   }
 
-  /// GET /plan/active — ambil rencana aktif saat ini
   Future<Map<String, dynamic>> getActivePlan() async {
-    final response = await _apiService.get(ApiEndpoints.activePlan);
-    return response.data as Map<String, dynamic>;
+    final res = await _apiService.get(ApiEndpoints.activePlan);
+    return res.data as Map<String, dynamic>;
   }
 
-  /// GET /plan/history — riwayat rencana sebelumnya
   Future<Map<String, dynamic>> getPlanHistory() async {
-    final response = await _apiService.get(ApiEndpoints.planHistory);
-    return response.data as Map<String, dynamic>;
+    final res = await _apiService.get(ApiEndpoints.planHistory);
+    return res.data as Map<String, dynamic>;
   }
 
-  /// POST /plan/replan — trigger replanning
-  Future<Map<String, dynamic>> requestReplan() async {
-    final response = await _apiService.post(ApiEndpoints.replan);
-    return response.data as Map<String, dynamic>;
+  Future<Map<String, dynamic>> getPlanById(String id) async {
+    final res = await _apiService.get(ApiEndpoints.planById(id));
+    return res.data as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> requestReplan({
+    bool applyImmediately = false,
+  }) async {
+    final res = await _apiService.post(
+      ApiEndpoints.replan,
+      data: {'applyImmediately': applyImmediately},
+    );
+    return res.data as Map<String, dynamic>;
+  }
+
+  Future<void> replanSkip() async {
+    await _apiService.post(ApiEndpoints.replanSkip);
   }
 }

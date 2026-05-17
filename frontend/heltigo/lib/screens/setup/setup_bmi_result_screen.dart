@@ -1,29 +1,43 @@
 /// S-08: Setup Profile Step 3/7 — Hasil BMI
-/// Sumber: docs/frontend/05_SCREENS_SPEC.md §S-08
-///
-/// Display (MOCK DATA — kalkulasi real nanti via ProfileProvider):
-/// - BMI hero card (gradient teal) dengan kategori
-/// - Grid 2x2: BMR, TDEE, Lemak%, Ideal weight
-/// - BMI Scale visual (rainbow bar dengan marker triangle)
-/// - Penjelasan singkat
+/// BMI/BMR/TDEE dihitung lokal dari draft data (tanpa API).
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../styles/styles.dart';
 import '../../widgets/setup/setup_scaffold.dart';
+import '../../providers/profile_draft_provider.dart';
 
 class SetupBmiResultScreen extends StatelessWidget {
   const SetupBmiResultScreen({super.key});
-
-  // Mock BMI values
-  static const double _mockBmi = 26.4;
-  static const String _mockCategory = 'Sedikit Lebih';
 
   void _onContinue(BuildContext context) {
     context.push('/setup-goal');
   }
 
+  String _categoryFor(double bmi) {
+    if (bmi < 18.5) return 'Kurus';
+    if (bmi < 25) return 'Normal';
+    if (bmi < 30) return 'Sedikit Lebih';
+    return 'Obesitas';
+  }
+
+  double? _idealWeight(ProfileDraftProvider draft) {
+    final h = draft.draft.heightCm;
+    if (h == null) return null;
+    // BMI target 22 (tengah normal)
+    final hm = h / 100;
+    return 22 * hm * hm;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final draft = context.watch<ProfileDraftProvider>();
+    final bmi = draft.bmi ?? 22.0;
+    final bmr = draft.bmr ?? 1500;
+    final tdee = draft.tdee ?? 2000;
+    final ideal = _idealWeight(draft) ?? 65;
+    final category = _categoryFor(bmi);
+
     return SetupScaffold(
       currentStep: 3,
       title: 'Hasil Profil Kesehatanmu',
@@ -34,15 +48,9 @@ class SetupBmiResultScreen extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ═══════════════════════════════════════
-          // BMI HERO CARD
-          // ═══════════════════════════════════════
-          const _BmiHeroCard(bmi: _mockBmi, category: _mockCategory),
+          _BmiHeroCard(bmi: bmi, category: category),
           const SizedBox(height: AppDimensions.base),
 
-          // ═══════════════════════════════════════
-          // METRICS GRID 2x2
-          // ═══════════════════════════════════════
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
@@ -50,32 +58,32 @@ class SetupBmiResultScreen extends StatelessWidget {
             mainAxisSpacing: AppDimensions.md,
             crossAxisSpacing: AppDimensions.md,
             childAspectRatio: 1.6,
-            children: const [
+            children: [
               _MetricCard(
                 icon: Icons.local_fire_department_outlined,
                 label: 'BMR',
-                value: '1.685',
+                value: bmr.toStringAsFixed(0),
                 unit: 'kkal',
                 accentColor: AppColors.accent,
               ),
               _MetricCard(
                 icon: Icons.bolt_outlined,
                 label: 'TDEE',
-                value: '2.320',
+                value: tdee.toStringAsFixed(0),
                 unit: 'kkal',
                 accentColor: AppColors.warning,
               ),
               _MetricCard(
                 icon: Icons.water_drop_outlined,
-                label: 'Lemak',
-                value: '22',
-                unit: '% tubuh',
+                label: 'BMI',
+                value: bmi.toStringAsFixed(1),
+                unit: '',
                 accentColor: AppColors.info,
               ),
               _MetricCard(
                 icon: Icons.fitness_center_outlined,
                 label: 'Ideal',
-                value: '68',
+                value: ideal.toStringAsFixed(0),
                 unit: 'kg',
                 accentColor: AppColors.success,
               ),
@@ -83,15 +91,9 @@ class SetupBmiResultScreen extends StatelessWidget {
           ),
           const SizedBox(height: AppDimensions.lg),
 
-          // ═══════════════════════════════════════
-          // BMI SCALE VISUAL
-          // ═══════════════════════════════════════
-          const _BmiScale(bmi: _mockBmi),
+          _BmiScale(bmi: bmi),
           const SizedBox(height: AppDimensions.lg),
 
-          // ═══════════════════════════════════════
-          // PENJELASAN
-          // ═══════════════════════════════════════
           Container(
             padding: const EdgeInsets.all(AppDimensions.base),
             decoration: BoxDecoration(
@@ -110,9 +112,7 @@ class SetupBmiResultScreen extends StatelessWidget {
                 const SizedBox(width: AppDimensions.md),
                 Expanded(
                   child: Text(
-                    'BMI kamu sedikit di atas normal. Dengan defisit kalori '
-                    'ringan dan latihan teratur, target ideal bisa tercapai '
-                    'dalam sekitar 12 minggu.',
+                    _insightFor(bmi),
                     style: AppTextStyles.body,
                   ),
                 ),
@@ -123,11 +123,24 @@ class SetupBmiResultScreen extends StatelessWidget {
       ),
     );
   }
-}
 
-// ═══════════════════════════════════════════════════════════════
-// BMI HERO CARD — gradient teal dengan angka besar + kategori
-// ═══════════════════════════════════════════════════════════════
+  String _insightFor(double bmi) {
+    if (bmi < 18.5) {
+      return 'BMI kamu di bawah normal. Fokus pada penambahan massa otot dengan '
+          'asupan protein cukup dan latihan kekuatan progresif.';
+    }
+    if (bmi < 25) {
+      return 'BMI kamu ideal! Pertahankan ritme hidup sehat dengan latihan '
+          'teratur dan pola makan seimbang.';
+    }
+    if (bmi < 30) {
+      return 'BMI kamu sedikit di atas normal. Dengan defisit kalori ringan dan '
+          'latihan teratur, target ideal bisa tercapai dalam ~12 minggu.';
+    }
+    return 'BMI kamu masuk kategori obesitas. AI akan rancang program dengan '
+        'intensitas rendah-sedang dan defisit kalori aman.';
+  }
+}
 
 class _BmiHeroCard extends StatelessWidget {
   final double bmi;
@@ -148,7 +161,6 @@ class _BmiHeroCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Overline label
           Text(
             'INDEKS MASSA TUBUH',
             style: AppTextStyles.overline.copyWith(
@@ -156,8 +168,6 @@ class _BmiHeroCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppDimensions.sm),
-
-          // Big BMI number
           Text(
             bmi.toStringAsFixed(1),
             style: AppTextStyles.display.copyWith(
@@ -167,8 +177,6 @@ class _BmiHeroCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppDimensions.md),
-
-          // Category pill
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: AppDimensions.md,
@@ -191,10 +199,6 @@ class _BmiHeroCard extends StatelessWidget {
     );
   }
 }
-
-// ═══════════════════════════════════════════════════════════════
-// METRIC CARD — kartu kecil untuk BMR/TDEE/Lemak/Ideal
-// ═══════════════════════════════════════════════════════════════
 
 class _MetricCard extends StatelessWidget {
   final IconData icon;
@@ -247,16 +251,18 @@ class _MetricCard extends StatelessWidget {
                   color: AppColors.textPrimary,
                 ),
               ),
-              const SizedBox(width: AppDimensions.xs),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(
-                  unit,
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.textTertiary,
+              if (unit.isNotEmpty) ...[
+                const SizedBox(width: AppDimensions.xs),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    unit,
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.textTertiary,
+                    ),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
         ],
@@ -265,17 +271,11 @@ class _MetricCard extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// BMI SCALE — horizontal gradient bar dengan marker triangle
-// ═══════════════════════════════════════════════════════════════
-
 class _BmiScale extends StatelessWidget {
   final double bmi;
 
   const _BmiScale({required this.bmi});
 
-  /// Hitung posisi marker (0.0 - 1.0) berdasarkan BMI.
-  /// Range: BMI 15 (kurus) — 35 (obesitas)
   double get _markerPosition {
     const minBmi = 15.0;
     const maxBmi = 35.0;
@@ -288,7 +288,6 @@ class _BmiScale extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Rainbow gradient bar dengan marker
         LayoutBuilder(
           builder: (context, constraints) {
             final markerLeft =
@@ -301,7 +300,6 @@ class _BmiScale extends StatelessWidget {
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  // Gradient bar
                   Container(
                     height: 10,
                     margin: const EdgeInsets.only(top: 18),
@@ -310,16 +308,15 @@ class _BmiScale extends StatelessWidget {
                           BorderRadius.circular(AppDimensions.radiusFull),
                       gradient: const LinearGradient(
                         colors: [
-                          Color(0xFF3B82F6), // blue — kurus
-                          Color(0xFF22C55E), // green — normal
-                          Color(0xFFF59E0B), // amber — lebih
-                          Color(0xFFFB3A01), // orange — obesitas
-                          Color(0xFFEF4444), // red — obesitas berat
+                          Color(0xFF3B82F6),
+                          Color(0xFF22C55E),
+                          Color(0xFFF59E0B),
+                          Color(0xFFFB3A01),
+                          Color(0xFFEF4444),
                         ],
                       ),
                     ),
                   ),
-                  // Marker triangle
                   Positioned(
                     left: markerLeft - 6,
                     top: 0,
@@ -346,35 +343,21 @@ class _BmiScale extends StatelessWidget {
           },
         ),
         const SizedBox(height: AppDimensions.sm),
-
-        // Labels
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Kurus',
-              style: AppTextStyles.caption.copyWith(
-                color: AppColors.textTertiary,
-              ),
-            ),
-            Text(
-              'Normal',
-              style: AppTextStyles.caption.copyWith(
-                color: AppColors.textTertiary,
-              ),
-            ),
-            Text(
-              'Lebih',
-              style: AppTextStyles.caption.copyWith(
-                color: AppColors.textTertiary,
-              ),
-            ),
-            Text(
-              'Obesitas',
-              style: AppTextStyles.caption.copyWith(
-                color: AppColors.textTertiary,
-              ),
-            ),
+            Text('Kurus',
+                style: AppTextStyles.caption.copyWith(
+                    color: AppColors.textTertiary)),
+            Text('Normal',
+                style: AppTextStyles.caption.copyWith(
+                    color: AppColors.textTertiary)),
+            Text('Lebih',
+                style: AppTextStyles.caption.copyWith(
+                    color: AppColors.textTertiary)),
+            Text('Obesitas',
+                style: AppTextStyles.caption.copyWith(
+                    color: AppColors.textTertiary)),
           ],
         ),
       ],

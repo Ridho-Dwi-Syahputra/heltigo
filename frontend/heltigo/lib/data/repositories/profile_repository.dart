@@ -1,43 +1,79 @@
-/// Profile Repository — abstraksi akses data profil & health metrics
-/// Sumber: docs/frontend/02_PROJECT_STRUCTURE.md
+/// Profile Repository — wrap ProfileService dengan parsing flat response.
 import 'package:heltigo/data/services/profile_service.dart';
 import 'package:heltigo/data/models/user_model.dart';
 import 'package:heltigo/data/models/health_profile_model.dart';
 
 abstract class ProfileRepository {
-  Future<UserModel> getProfile();
+  Future<({UserModel user, HealthProfileModel? healthProfile})> getProfile();
   Future<UserModel> updateProfile(Map<String, dynamic> data);
-  Future<HealthProfileModel> getHealthMetrics();
-  Future<HealthProfileModel> saveHealthMetrics(Map<String, dynamic> data);
+  Future<UserModel> updateAvatar(String avatarUrl);
+  Future<HealthProfileModel> createHealthProfile(Map<String, dynamic> data);
+  Future<HealthProfileModel> updateHealthProfile(Map<String, dynamic> data);
+  Future<Map<String, dynamic>> getCurrentMetrics();
+  Future<Map<String, dynamic>> logHealthMetric({double? weightKg});
+  Future<Map<String, dynamic>> getMetricsHistory({int days = 30});
 }
 
 class ProfileRepositoryImpl implements ProfileRepository {
-  final ProfileService _profileService;
+  final ProfileService _service;
 
-  ProfileRepositoryImpl(this._profileService);
+  ProfileRepositoryImpl(this._service);
 
   @override
-  Future<UserModel> getProfile() async {
-    final json = await _profileService.getProfile();
-    return UserModel.fromJson(json['data'] as Map<String, dynamic>);
+  Future<({UserModel user, HealthProfileModel? healthProfile})>
+      getProfile() async {
+    final json = await _service.getProfile();
+    final user = UserModel.fromJson(json['user'] as Map<String, dynamic>);
+    final hpJson = json['healthProfile'];
+    final hp = hpJson is Map<String, dynamic>
+        ? HealthProfileModel.fromJson(hpJson)
+        : null;
+    return (user: user, healthProfile: hp);
   }
 
   @override
   Future<UserModel> updateProfile(Map<String, dynamic> data) async {
-    final json = await _profileService.updateProfile(data);
-    return UserModel.fromJson(json['data'] as Map<String, dynamic>);
+    final json = await _service.updateProfile(data);
+    final userJson = (json['user'] ?? json) as Map<String, dynamic>;
+    return UserModel.fromJson(userJson);
   }
 
   @override
-  Future<HealthProfileModel> getHealthMetrics() async {
-    final json = await _profileService.getHealthMetrics();
-    return HealthProfileModel.fromJson(json['data'] as Map<String, dynamic>);
+  Future<UserModel> updateAvatar(String avatarUrl) async {
+    final json = await _service.updateAvatar(avatarUrl);
+    final userJson = (json['user'] ?? json) as Map<String, dynamic>;
+    return UserModel.fromJson(userJson);
   }
 
   @override
-  Future<HealthProfileModel> saveHealthMetrics(
+  Future<HealthProfileModel> createHealthProfile(
       Map<String, dynamic> data) async {
-    final json = await _profileService.saveHealthMetrics(data);
-    return HealthProfileModel.fromJson(json['data'] as Map<String, dynamic>);
+    final json = await _service.createHealthProfile(data);
+    final hpJson =
+        (json['healthProfile'] ?? json) as Map<String, dynamic>;
+    return HealthProfileModel.fromJson(hpJson);
   }
+
+  @override
+  Future<HealthProfileModel> updateHealthProfile(
+      Map<String, dynamic> data) async {
+    final json = await _service.updateHealthProfile(data);
+    final hpJson =
+        (json['healthProfile'] ?? json) as Map<String, dynamic>;
+    return HealthProfileModel.fromJson(hpJson);
+  }
+
+  @override
+  Future<Map<String, dynamic>> getCurrentMetrics() =>
+      _service.getHealthMetrics();
+
+  @override
+  Future<Map<String, dynamic>> logHealthMetric({double? weightKg}) =>
+      _service.saveHealthMetrics(
+        weightKg != null ? {'weightKg': weightKg} : {},
+      );
+
+  @override
+  Future<Map<String, dynamic>> getMetricsHistory({int days = 30}) =>
+      _service.getHealthMetricsHistory(days: days);
 }

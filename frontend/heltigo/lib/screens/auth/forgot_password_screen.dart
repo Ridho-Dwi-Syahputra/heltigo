@@ -7,7 +7,9 @@
 /// - Bottom link "Ingat password? Masuk"
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../styles/styles.dart';
+import '../../providers/auth_provider.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -28,9 +30,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
-  void _handleSend() {
-    if (_formKey.currentState!.validate()) {
-      // TODO: Integrate with AuthProvider.forgotPassword()
+  Future<void> _handleSend() async {
+    if (!_formKey.currentState!.validate()) return;
+    final auth = context.read<AuthProvider>();
+    final ok = await auth.forgotPassword(_emailController.text.trim());
+    if (ok && mounted) {
       setState(() => _emailSent = true);
     }
   }

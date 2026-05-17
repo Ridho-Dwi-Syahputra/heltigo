@@ -11,7 +11,9 @@
 /// - Link ke Register
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../styles/styles.dart';
+import '../../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -168,17 +170,68 @@ class _LoginScreenState extends State<LoginScreen> {
                 // ═══════════════════════════════════════
                 // TOMBOL MASUK
                 // ═══════════════════════════════════════
-                SizedBox(
-                  height: AppDimensions.buttonHeight,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // TODO: Implementasi login via AuthProvider
-                        context.go('/home');
-                      }
-                    },
-                    child: const Text('Masuk'),
-                  ),
+                Consumer<AuthProvider>(
+                  builder: (context, auth, _) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (auth.errorMessage != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: AppColors.error.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: AppColors.error.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Text(
+                              auth.errorMessage!,
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.error,
+                              ),
+                            ),
+                          ),
+                        SizedBox(
+                          height: AppDimensions.buttonHeight,
+                          child: ElevatedButton(
+                            onPressed: auth.isLoading
+                                ? null
+                                : () async {
+                                    if (!_formKey.currentState!.validate()) {
+                                      return;
+                                    }
+                                    final ok = await auth.login(
+                                      _emailController.text.trim(),
+                                      _passwordController.text,
+                                    );
+                                    if (ok && context.mounted) {
+                                      // Router redirect akan handle ke
+                                      // /home atau /setup-profile
+                                      if (auth.hasHealthProfile) {
+                                        context.go('/home');
+                                      } else {
+                                        context.go('/setup-profile');
+                                      }
+                                    }
+                                  },
+                            child: auth.isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text('Masuk'),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 24),
 

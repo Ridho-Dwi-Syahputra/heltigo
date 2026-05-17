@@ -1,8 +1,9 @@
-/// App Router — GoRouter configuration
-/// Sumber: docs/frontend/04_NAVIGATION.md
-/// Pattern: sama dengan reference repo (app_router.dart)
+/// App Router — GoRouter configuration dengan auth guard.
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import 'package:heltigo/service_locator.dart';
+import 'package:heltigo/providers/auth_provider.dart';
 
 // Screens
 import 'package:heltigo/screens/splash/splash_screen.dart';
@@ -44,13 +45,27 @@ import 'package:heltigo/screens/settings/about_screen.dart';
 import 'package:heltigo/screens/notification/notification_screen.dart';
 import 'package:heltigo/screens/error/error_screen.dart';
 
-// Replanning flow
 import 'package:heltigo/screens/replanning/replanning_evaluation_screen.dart';
 import 'package:heltigo/screens/replanning/replanning_update_data_screen.dart';
 import 'package:heltigo/screens/replanning/replanning_choose_screen.dart';
 import 'package:heltigo/screens/replanning/replanning_ready_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
+/// Path yang BOLEH diakses tanpa login.
+const _publicRoutes = {
+  '/',
+  '/onboarding',
+  '/login',
+  '/register',
+  '/forgot-password',
+};
+
+/// Path 7 setup wizard — boleh diakses kalau login tapi belum punya profile.
+bool _isSetupRoute(String location) =>
+    location.startsWith('/setup-') ||
+    location == '/plan-generating' ||
+    location == '/plan-ready';
 
 class AppRouter {
   static GoRouter get router => _router;
@@ -59,260 +74,237 @@ class AppRouter {
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
     debugLogDiagnostics: true,
+    refreshListenable: getIt<AuthProvider>(),
+    redirect: (context, state) {
+      final auth = getIt<AuthProvider>();
+      final loc = state.matchedLocation;
+      final isPublic = _publicRoutes.contains(loc);
+
+      // Splash selalu jalan dulu (untuk render animasi)
+      if (loc == '/') return null;
+
+      // Belum login + bukan public → ke /login
+      if (!auth.isLoggedIn && !isPublic) {
+        return '/login';
+      }
+
+      // Sudah login + di public auth route → langsung ke home
+      if (auth.isLoggedIn && (loc == '/login' || loc == '/register')) {
+        return auth.hasHealthProfile ? '/home' : '/setup-profile';
+      }
+
+      // Sudah login tapi belum punya health profile + bukan setup → paksa setup
+      if (auth.isLoggedIn &&
+          !auth.hasHealthProfile &&
+          !_isSetupRoute(loc) &&
+          !isPublic) {
+        return '/setup-profile';
+      }
+
+      return null;
+    },
     routes: [
-      // ═══════════════════════════════════════
-      // SPLASH & ONBOARDING
-      // ═══════════════════════════════════════
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const SplashScreen(),
-      ),
+      // ═══ SPLASH & ONBOARDING ═══
+      GoRoute(path: '/', builder: (_, __) => const SplashScreen()),
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => const OnboardingScreen(),
+        builder: (_, __) => const OnboardingScreen(),
       ),
 
-      // ═══════════════════════════════════════
-      // AUTH
-      // ═══════════════════════════════════════
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
-      GoRoute(
-        path: '/register',
-        builder: (context, state) => const RegisterScreen(),
-      ),
+      // ═══ AUTH ═══
+      GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+      GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
       GoRoute(
         path: '/forgot-password',
-        builder: (context, state) => const ForgotPasswordScreen(),
+        builder: (_, __) => const ForgotPasswordScreen(),
       ),
 
-      // ═══════════════════════════════════════
-      // SETUP PROFILE (7 steps)
-      // Flow: basic → physical → bmi → goal → conditions → fitness → preferences
-      // ═══════════════════════════════════════
+      // ═══ SETUP PROFILE (7 steps) ═══
       GoRoute(
         path: '/setup-profile',
-        builder: (context, state) => const SetupBasicInfoScreen(),
+        builder: (_, __) => const SetupBasicInfoScreen(),
       ),
       GoRoute(
         path: '/setup-physical',
-        builder: (context, state) => const SetupPhysicalScreen(),
+        builder: (_, __) => const SetupPhysicalScreen(),
       ),
       GoRoute(
         path: '/setup-bmi-result',
-        builder: (context, state) => const SetupBmiResultScreen(),
+        builder: (_, __) => const SetupBmiResultScreen(),
       ),
       GoRoute(
         path: '/setup-goal',
-        builder: (context, state) => const SetupGoalScreen(),
+        builder: (_, __) => const SetupGoalScreen(),
       ),
       GoRoute(
         path: '/setup-conditions',
-        builder: (context, state) => const SetupConditionsScreen(),
+        builder: (_, __) => const SetupConditionsScreen(),
       ),
       GoRoute(
         path: '/setup-fitness-level',
-        builder: (context, state) => const SetupFitnessLevelScreen(),
+        builder: (_, __) => const SetupFitnessLevelScreen(),
       ),
       GoRoute(
         path: '/setup-preferences',
-        builder: (context, state) => const SetupPreferencesScreen(),
+        builder: (_, __) => const SetupPreferencesScreen(),
       ),
 
-      // ═══════════════════════════════════════
-      // PLAN GENERATION
-      // ═══════════════════════════════════════
+      // ═══ PLAN GENERATION ═══
       GoRoute(
         path: '/plan-generating',
-        builder: (context, state) => const PlanGeneratingScreen(),
+        builder: (_, __) => const PlanGeneratingScreen(),
       ),
       GoRoute(
         path: '/plan-ready',
-        builder: (context, state) => const PlanReadyScreen(),
+        builder: (_, __) => const PlanReadyScreen(),
       ),
 
-      // ═══════════════════════════════════════
-      // MAIN SCAFFOLD (4 tabs via Bottom Nav)
-      // ═══════════════════════════════════════
+      // ═══ MAIN SCAFFOLD (4 tabs) ═══
       GoRoute(
         path: '/home',
-        pageBuilder: (context, state) => const NoTransitionPage(
-          child: MainScaffold(initialIndex: 0),
-        ),
+        pageBuilder: (_, __) =>
+            const NoTransitionPage(child: MainScaffold(initialIndex: 0)),
       ),
       GoRoute(
         path: '/workout',
-        pageBuilder: (context, state) => const NoTransitionPage(
-          child: MainScaffold(initialIndex: 1),
-        ),
+        pageBuilder: (_, __) =>
+            const NoTransitionPage(child: MainScaffold(initialIndex: 1)),
       ),
       GoRoute(
         path: '/meal',
-        pageBuilder: (context, state) => const NoTransitionPage(
-          child: MainScaffold(initialIndex: 2),
-        ),
+        pageBuilder: (_, __) =>
+            const NoTransitionPage(child: MainScaffold(initialIndex: 2)),
       ),
       GoRoute(
         path: '/progress',
-        pageBuilder: (context, state) => const NoTransitionPage(
-          child: MainScaffold(initialIndex: 3),
-        ),
+        pageBuilder: (_, __) =>
+            const NoTransitionPage(child: MainScaffold(initialIndex: 3)),
       ),
 
-      // ═══════════════════════════════════════
-      // WORKOUT SUB-SCREENS
-      // ═══════════════════════════════════════
+      // ═══ WORKOUT SUB-SCREENS ═══
       GoRoute(
         path: '/workout/checkin/:workoutId',
-        builder: (context, state) => PreWorkoutCheckInScreen(
+        builder: (_, state) => PreWorkoutCheckInScreen(
           workoutId: state.pathParameters['workoutId']!,
         ),
       ),
       GoRoute(
         path: '/workout/active/:workoutId',
-        builder: (context, state) => ActiveWorkoutScreen(
+        builder: (_, state) => ActiveWorkoutScreen(
           workoutId: state.pathParameters['workoutId']!,
         ),
       ),
       GoRoute(
         path: '/workout/complete/:workoutId',
-        builder: (context, state) => WorkoutCompleteScreen(
+        builder: (_, state) => WorkoutCompleteScreen(
           workoutId: state.pathParameters['workoutId']!,
         ),
       ),
       GoRoute(
         path: '/workout/detail/:workoutId',
-        builder: (context, state) => WorkoutDetailScreen(
+        builder: (_, state) => WorkoutDetailScreen(
           workoutId: state.pathParameters['workoutId']!,
         ),
       ),
       GoRoute(
         path: '/workout/exercise/:exerciseId',
-        builder: (context, state) => ExerciseDetailScreen(
+        builder: (_, state) => ExerciseDetailScreen(
           exerciseId: state.pathParameters['exerciseId']!,
         ),
       ),
       GoRoute(
         path: '/workout/session/:sessionId',
-        builder: (context, state) => WorkoutSessionDetailScreen(
+        builder: (_, state) => WorkoutSessionDetailScreen(
           sessionId: state.pathParameters['sessionId']!,
         ),
       ),
 
-      // ═══════════════════════════════════════
-      // MEAL SUB-SCREENS
-      // ═══════════════════════════════════════
+      // ═══ MEAL SUB-SCREENS ═══
       GoRoute(
         path: '/meal/detail/:mealId',
-        builder: (context, state) => MealDetailScreen(
+        builder: (_, state) => MealDetailScreen(
           mealId: state.pathParameters['mealId']!,
         ),
       ),
       GoRoute(
         path: '/meal/swap/:mealId',
-        builder: (context, state) => MealSwapScreen(
-          mealId: state.pathParameters['mealId']!,
-        ),
+        builder: (_, state) =>
+            MealSwapScreen(mealId: state.pathParameters['mealId']!),
       ),
       GoRoute(
         path: '/meal/food/:foodId',
-        builder: (context, state) => FoodItemDetailScreen(
-          foodId: state.pathParameters['foodId']!,
-        ),
+        builder: (_, state) =>
+            FoodItemDetailScreen(foodId: state.pathParameters['foodId']!),
       ),
       GoRoute(
         path: '/meal/budget-settings',
-        builder: (context, state) => const BudgetSettingsScreen(),
+        builder: (_, __) => const BudgetSettingsScreen(),
       ),
       GoRoute(
         path: '/meal/food-scan',
-        builder: (context, state) => const FoodScanScreen(),
+        builder: (_, __) => const FoodScanScreen(),
       ),
       GoRoute(
         path: '/meal/log/:mealId',
-        builder: (context, state) => MealLogScreen(
-          mealId: state.pathParameters['mealId']!,
-        ),
+        builder: (_, state) =>
+            MealLogScreen(mealId: state.pathParameters['mealId']!),
       ),
 
-      // ═══════════════════════════════════════
-      // PROGRESS SUB-SCREENS
-      // ═══════════════════════════════════════
+      // ═══ PROGRESS SUB-SCREENS ═══
       GoRoute(
         path: '/progress/weekly-review',
-        builder: (context, state) => const WeeklyReviewScreen(),
+        builder: (_, __) => const WeeklyReviewScreen(),
       ),
       GoRoute(
         path: '/progress/badges',
-        builder: (context, state) => const BadgeGalleryScreen(),
+        builder: (_, __) => const BadgeGalleryScreen(),
       ),
       GoRoute(
         path: '/progress/streak',
-        builder: (context, state) => const StreakDetailScreen(),
+        builder: (_, __) => const StreakDetailScreen(),
       ),
 
-      // ═══════════════════════════════════════
-      // PROFILE SUB-SCREENS
-      // ═══════════════════════════════════════
-      GoRoute(
-        path: '/profile',
-        builder: (context, state) => const ProfileScreen(),
-      ),
+      // ═══ PROFILE SUB-SCREENS ═══
+      GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
       GoRoute(
         path: '/profile/edit',
-        builder: (context, state) => const EditProfileScreen(),
+        builder: (_, __) => const EditProfileScreen(),
       ),
       GoRoute(
         path: '/profile/health-metrics',
-        builder: (context, state) => const HealthMetricsScreen(),
+        builder: (_, __) => const HealthMetricsScreen(),
       ),
       GoRoute(
         path: '/profile/plan-history',
-        builder: (context, state) => const PlanHistoryScreen(),
+        builder: (_, __) => const PlanHistoryScreen(),
       ),
 
-      // ═══════════════════════════════════════
-      // SETTINGS & INFO
-      // ═══════════════════════════════════════
-      GoRoute(
-        path: '/settings',
-        builder: (context, state) => const SettingsScreen(),
-      ),
-      GoRoute(
-        path: '/about',
-        builder: (context, state) => const AboutScreen(),
-      ),
+      // ═══ SETTINGS & INFO ═══
+      GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
+      GoRoute(path: '/about', builder: (_, __) => const AboutScreen()),
       GoRoute(
         path: '/notifications',
-        builder: (context, state) => const NotificationScreen(),
+        builder: (_, __) => const NotificationScreen(),
       ),
 
-      // ═══════════════════════════════════════
-      // REPLANNING FLOW (4 step)
-      // ═══════════════════════════════════════
+      // ═══ REPLANNING FLOW ═══
       GoRoute(
         path: '/replanning/evaluation',
-        builder: (context, state) => const ReplanningEvaluationScreen(),
+        builder: (_, __) => const ReplanningEvaluationScreen(),
       ),
       GoRoute(
         path: '/replanning/update',
-        builder: (context, state) => const ReplanningUpdateDataScreen(),
+        builder: (_, __) => const ReplanningUpdateDataScreen(),
       ),
       GoRoute(
         path: '/replanning/choose',
-        builder: (context, state) => const ReplanningChooseScreen(),
+        builder: (_, __) => const ReplanningChooseScreen(),
       ),
       GoRoute(
         path: '/replanning/ready',
-        builder: (context, state) => const ReplanningReadyScreen(),
+        builder: (_, __) => const ReplanningReadyScreen(),
       ),
     ],
-
-    // Error handler
-    errorBuilder: (context, state) => ErrorScreen(
-      message: state.error?.message,
-    ),
+    errorBuilder: (_, state) => ErrorScreen(message: state.error?.message),
   );
 }

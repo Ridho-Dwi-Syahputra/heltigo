@@ -7,8 +7,10 @@
 /// - Lingkar Pinggang (opsional, text input cm)
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../styles/styles.dart';
 import '../../widgets/setup/setup_scaffold.dart';
+import '../../providers/profile_draft_provider.dart';
 
 class SetupPhysicalScreen extends StatefulWidget {
   const SetupPhysicalScreen({super.key});
@@ -45,7 +47,11 @@ class _SetupPhysicalScreenState extends State<SetupPhysicalScreen> {
   String get _weightUnitLabel => _weightUnit == 0 ? 'kg' : 'lbs';
 
   void _onContinue() {
-    // TODO: Save tinggi, berat, waist ke ProfileProvider draft
+    final draft = context.read<ProfileDraftProvider>();
+    draft.updatePhysical(
+      heightCm: _heightCm,
+      weightKg: _weightKg,
+    );
     context.push('/setup-bmi-result');
   }
 

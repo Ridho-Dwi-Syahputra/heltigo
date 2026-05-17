@@ -9,9 +9,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../styles/styles.dart';
 import '../../widgets/setup/selection_card.dart';
 import '../../widgets/setup/setup_scaffold.dart';
+import '../../providers/profile_draft_provider.dart';
 
 enum _Gender { male, female }
 
@@ -91,7 +93,12 @@ class _SetupBasicInfoScreenState extends State<SetupBasicInfoScreen> {
       _gender != null;
 
   void _onContinue() {
-    // TODO: Save data ke ProfileProvider draft
+    final draft = context.read<ProfileDraftProvider>();
+    draft.updateBasicInfo(
+      name: _nameController.text.trim(),
+      age: _dob != null ? _calculateAge(_dob!) : null,
+      gender: _gender == _Gender.male ? 'M' : 'F',
+    );
     context.push('/setup-physical');
   }
 

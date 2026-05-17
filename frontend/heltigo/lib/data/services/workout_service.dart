@@ -1,5 +1,4 @@
-/// Workout Service — komunikasi API untuk workout endpoints
-/// Sumber: docs/frontend/08_API_INTEGRATION.md
+/// Workout Service — komunikasi API untuk workout endpoints.
 import 'package:heltigo/data/api/api_service.dart';
 import 'package:heltigo/data/api/endpoints.dart';
 
@@ -8,43 +7,76 @@ class WorkoutService {
 
   WorkoutService(this._apiService);
 
-  /// GET /workout/today — ambil workout hari ini
   Future<Map<String, dynamic>> getTodayWorkout() async {
-    final response = await _apiService.get(ApiEndpoints.todayWorkout);
-    return response.data as Map<String, dynamic>;
+    final res = await _apiService.get(ApiEndpoints.todayWorkout);
+    return res.data as Map<String, dynamic>;
   }
 
-  /// GET /workout/:id — detail workout
-  Future<Map<String, dynamic>> getWorkoutDetail(String id) async {
-    final response =
-        await _apiService.get(ApiEndpoints.workoutDetail(id));
-    return response.data as Map<String, dynamic>;
+  Future<Map<String, dynamic>> getWorkoutDayDetail(String dayId) async {
+    final res = await _apiService.get(ApiEndpoints.workoutDayDetail(dayId));
+    return res.data as Map<String, dynamic>;
   }
 
-  /// POST /workout/:id/check-in — pre-workout check-in
+  Future<Map<String, dynamic>> getExerciseDetail(String exerciseId) async {
+    final res =
+        await _apiService.get(ApiEndpoints.workoutExerciseDetail(exerciseId));
+    return res.data as Map<String, dynamic>;
+  }
+
   Future<Map<String, dynamic>> checkIn(
-      String id, Map<String, dynamic> data) async {
-    final response = await _apiService.post(
-      ApiEndpoints.workoutCheckIn(id),
+      String dayId, Map<String, dynamic> data) async {
+    final res = await _apiService.post(
+      ApiEndpoints.workoutCheckIn(dayId),
       data: data,
     );
-    return response.data as Map<String, dynamic>;
+    return res.data as Map<String, dynamic>;
   }
 
-  /// POST /workout/:id/complete — selesaikan workout
-  Future<Map<String, dynamic>> completeWorkout(String id) async {
-    final response =
-        await _apiService.post(ApiEndpoints.workoutComplete(id));
-    return response.data as Map<String, dynamic>;
+  Future<Map<String, dynamic>> getSessionDetail(String sessionId) async {
+    final res =
+        await _apiService.get(ApiEndpoints.workoutSessionDetail(sessionId));
+    return res.data as Map<String, dynamic>;
   }
 
-  /// PATCH /workout/:id/exercise/complete — tandai exercise selesai
-  Future<Map<String, dynamic>> completeExercise(
-      String workoutId, Map<String, dynamic> data) async {
-    final response = await _apiService.patch(
-      ApiEndpoints.exerciseComplete(workoutId),
+  Future<Map<String, dynamic>> completeSession(
+      String sessionId, Map<String, dynamic> data) async {
+    final res = await _apiService.post(
+      ApiEndpoints.workoutSessionComplete(sessionId),
       data: data,
     );
-    return response.data as Map<String, dynamic>;
+    return res.data as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> pauseSession(String sessionId) async {
+    final res = await _apiService.post(
+      ApiEndpoints.workoutSessionPause(sessionId),
+    );
+    return res.data as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> updateExercise(
+      String sessionId, Map<String, dynamic> data) async {
+    final res = await _apiService.patch(
+      ApiEndpoints.workoutSessionUpdateExercise(sessionId),
+      data: data,
+    );
+    return res.data as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> swapExercise(
+      String exerciseId, Map<String, dynamic> data) async {
+    final res = await _apiService.post(
+      ApiEndpoints.workoutExerciseSwap(exerciseId),
+      data: data,
+    );
+    return res.data as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> getSessionsHistory({int limit = 20}) async {
+    final res = await _apiService.get(
+      ApiEndpoints.workoutSessions,
+      queryParameters: {'limit': limit},
+    );
+    return res.data as Map<String, dynamic>;
   }
 }

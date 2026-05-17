@@ -8,8 +8,10 @@
 /// - Calorie adjustment is calculated by ML backend
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../styles/styles.dart';
 import '../../widgets/setup/setup_scaffold.dart';
+import '../../providers/profile_draft_provider.dart';
 
 enum _Goal { lose, maintain, gain }
 
@@ -33,8 +35,20 @@ class _SetupGoalScreenState extends State<SetupGoalScreen> {
   bool get _canContinue => _selectedGoal != null;
 
   void _onContinue() {
-    // TODO: Save goal and target weight to ProfileProvider
-    // Timeline will be determined by ML backend
+    final draft = context.read<ProfileDraftProvider>();
+    final goalCode = switch (_selectedGoal) {
+      _Goal.lose => 'WEIGHT_LOSS',
+      _Goal.gain => 'MUSCLE_GAIN',
+      _Goal.maintain => 'MAINTENANCE',
+      _ => 'MAINTENANCE',
+    };
+    draft.updateGoal(goalCode);
+    if (_selectedGoal != _Goal.maintain) {
+      final tw = double.tryParse(_targetWeightController.text);
+      if (tw != null) {
+        draft.updatePhysical(targetWeightKg: tw);
+      }
+    }
     context.push('/setup-conditions');
   }
 

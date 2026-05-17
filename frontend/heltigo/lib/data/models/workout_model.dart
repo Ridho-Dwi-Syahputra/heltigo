@@ -1,91 +1,121 @@
-/// Workout plan model — rencana latihan dari ML service
-/// Sumber: docs/backend/03_DATABASE_SCHEMA.md (tabel WorkoutPlan, WorkoutDay, Exercise)
+/// Workout plan model — match dengan backend `workout_plans` table.
 class WorkoutPlanModel {
   final String id;
-  final String planId;
+  final String? name;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final String? status;
+  final bool isActive;
   final List<WorkoutDayModel> days;
 
   WorkoutPlanModel({
     required this.id,
-    required this.planId,
+    this.name,
+    this.startDate,
+    this.endDate,
+    this.status,
+    this.isActive = true,
     required this.days,
   });
 
   factory WorkoutPlanModel.fromJson(Map<String, dynamic> json) {
     return WorkoutPlanModel(
-      id: json['id'] as String,
-      planId: json['planId'] as String,
+      id: json['id'].toString(),
+      name: json['name'] as String?,
+      startDate: _parseDate(json['startDate']),
+      endDate: _parseDate(json['endDate']),
+      status: json['status'] as String?,
+      isActive: json['isActive'] as bool? ?? true,
       days: (json['days'] as List<dynamic>?)
               ?.map((e) => WorkoutDayModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
     );
   }
+
+  static DateTime? _parseDate(dynamic v) {
+    if (v == null) return null;
+    return DateTime.tryParse(v.toString());
+  }
 }
 
 class WorkoutDayModel {
   final String id;
   final int dayNumber;
-  final String workoutType;
-  final String intensity;
-  final int durationMin;
-  final List<ExerciseModel> exercises;
+  final DateTime? date;
+  final String workoutType; // STRENGTH/CARDIO/HIIT/FLEXIBILITY/REST
+  final String? intensity; // LOW/MID/HIGH
+  final String? name;
+  final int? durationMin;
+  final int? totalSets;
   final bool isCompleted;
+  final List<ExerciseModel> exercises;
 
   WorkoutDayModel({
     required this.id,
     required this.dayNumber,
+    this.date,
     required this.workoutType,
-    required this.intensity,
-    required this.durationMin,
-    required this.exercises,
+    this.intensity,
+    this.name,
+    this.durationMin,
+    this.totalSets,
     this.isCompleted = false,
+    required this.exercises,
   });
 
   factory WorkoutDayModel.fromJson(Map<String, dynamic> json) {
     return WorkoutDayModel(
-      id: json['id'] as String,
-      dayNumber: json['dayNumber'] as int,
-      workoutType: json['workoutType'] as String,
-      intensity: json['intensity'] as String,
-      durationMin: json['durationMin'] as int,
+      id: json['id'].toString(),
+      dayNumber: (json['dayNumber'] as num?)?.toInt() ?? 0,
+      date: json['date'] != null ? DateTime.tryParse(json['date'].toString()) : null,
+      workoutType: (json['workoutType'] ?? 'STRENGTH').toString(),
+      intensity: json['intensity'] as String?,
+      name: json['name'] as String?,
+      durationMin: (json['durationMin'] as num?)?.toInt(),
+      totalSets: (json['totalSets'] as num?)?.toInt(),
+      isCompleted: json['isCompleted'] as bool? ?? false,
       exercises: (json['exercises'] as List<dynamic>?)
               ?.map((e) => ExerciseModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      isCompleted: json['isCompleted'] as bool? ?? false,
     );
   }
+
+  bool get isRestDay => workoutType == 'REST';
 }
 
 class ExerciseModel {
   final String id;
   final String name;
+  final String category; // WARMUP / MAIN / COOLDOWN
   final int sets;
-  final int reps;
+  final int? reps;
   final int? durationSec;
-  final String? notes;
-  final bool isCompleted;
+  final int restSec;
+  final int orderIndex;
 
   ExerciseModel({
     required this.id,
     required this.name,
+    required this.category,
     required this.sets,
-    required this.reps,
+    this.reps,
     this.durationSec,
-    this.notes,
-    this.isCompleted = false,
+    this.restSec = 60,
+    this.orderIndex = 0,
   });
 
   factory ExerciseModel.fromJson(Map<String, dynamic> json) {
     return ExerciseModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      sets: json['sets'] as int,
-      reps: json['reps'] as int,
-      durationSec: json['durationSec'] as int?,
-      notes: json['notes'] as String?,
-      isCompleted: json['isCompleted'] as bool? ?? false,
+      id: json['id'].toString(),
+      name: (json['name'] ?? 'Exercise').toString(),
+      category: (json['category'] ?? 'MAIN').toString(),
+      sets: (json['sets'] as num?)?.toInt() ?? 1,
+      reps: (json['reps'] as num?)?.toInt(),
+      durationSec: (json['durationSec'] as num?)?.toInt(),
+      restSec: (json['restSec'] as num?)?.toInt() ?? 60,
+      orderIndex: (json['orderIndex'] as num?)?.toInt() ?? 0,
     );
   }
 }

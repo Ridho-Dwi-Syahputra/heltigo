@@ -9,7 +9,9 @@
 /// - Dark background solid
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../styles/styles.dart';
+import '../../providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -80,12 +82,21 @@ class _SplashScreenState extends State<SplashScreen>
       _mottoController.forward();
     });
 
-    // Navigate ke onboarding setelah 3.5 detik total
-    // (cukup lama untuk user melihat logo + motto dengan nyaman)
-    Future.delayed(const Duration(milliseconds: 3500), () {
+    // Setelah 2.5 detik, redirect berdasarkan state auth.
+    Future.delayed(const Duration(milliseconds: 2500), () {
       if (!mounted) return;
-      // TODO: Cek auth state → arahkan ke /onboarding atau /home
-      context.go('/onboarding');
+      final auth = context.read<AuthProvider>();
+      if (auth.isLoggedIn) {
+        // Sudah login — auth guard router akan handle redirect
+        // ke /setup-profile jika hasHealthProfile == false.
+        if (auth.hasHealthProfile) {
+          context.go('/home');
+        } else {
+          context.go('/setup-profile');
+        }
+      } else {
+        context.go('/onboarding');
+      }
     });
   }
 
